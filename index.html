@@ -122,6 +122,18 @@
             width: 100vw;
         }
 
+        /* Mobile Viewport Optimizations */
+        @media (max-width: 768px) {
+            main {
+                flex-direction: column !important;
+                padding: 4px !important;
+                gap: 4px !important;
+            }
+            header h1 {
+                font-size: 11px !important;
+            }
+        }
+
         .font-board { font-family: 'Fredoka', sans-serif; }
         .font-mono { font-family: 'JetBrains Mono', monospace; }
 
@@ -181,8 +193,18 @@
 
         <!-- Scrollable Mobile Button Action Bar -->
         <div class="flex items-center gap-1 overflow-x-auto no-scrollbar py-0.5 max-w-[75vw] sm:max-w-none">
+            <!-- Undo & Next (Redo) Controls -->
+            <button id="undoBtn" onclick="undoMove()" class="bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed text-white text-[10px] sm:text-xs font-bold px-2 py-1 sm:px-2.5 sm:py-1.5 rounded-lg transition shadow-sm shrink-0 flex items-center gap-1" title="Undo Move">
+                <span>↩</span><span class="hidden xs:inline">Undo</span>
+            </button>
+            <button id="redoBtn" onclick="redoMove()" class="bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed text-white text-[10px] sm:text-xs font-bold px-2 py-1 sm:px-2.5 sm:py-1.5 rounded-lg transition shadow-sm shrink-0 flex items-center gap-1" title="Next / Redo Move">
+                <span class="hidden xs:inline">Next</span><span>↪</span>
+            </button>
+
             <button id="readyBtn" class="bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] sm:text-xs font-bold px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg transition shadow-sm shrink-0">Ready / Start</button>
+            <!-- Dynamic Pause / Resume Indicator Button -->
             <button id="pauseBtn" class="bg-amber-700 hover:bg-amber-800 text-white text-[10px] sm:text-xs font-bold px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg transition shadow-sm shrink-0">Pause</button>
+            
             <button id="configBtn" class="theme-btn-accent text-[10px] sm:text-xs font-bold px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg transition shadow-sm flex items-center gap-0.5 shrink-0">
                 <span>⚙️</span> <span class="hidden xs:inline">Setup</span>
             </button>
@@ -243,11 +265,11 @@
 
             <!-- Bottom Board Controls & Status Bar -->
             <div class="flex justify-between items-center w-full px-1 shrink-0 gap-1 h-[32px]">
-                <button id="redDrawBtn" class="bg-rose-100 border border-rose-300 text-rose-800 hover:bg-rose-200 text-[9px] sm:text-[10px] font-bold px-2 py-1 rounded-lg transition shrink-0">Roast Draw</button>
+                <button id="redDrawBtn" onclick="requestDraw('red')" class="bg-rose-100 border border-rose-300 text-rose-800 hover:bg-rose-200 text-[9px] sm:text-[10px] font-bold px-2 py-1 rounded-lg transition shrink-0">Roast Draw</button>
                 <div id="statusMessage" class="text-[10px] sm:text-[11px] text-center text-[var(--text-muted)] theme-subcard px-2 py-0.5 rounded-xl border flex-1 max-w-md font-medium truncate mx-1">
-                    Click Ready to start! Select pieces in center to move into box a or b.
+                    Click Ready to start! Select any piece on the board to move forward or step into boxes.
                 </div>
-                <button id="blueDrawBtn" class="bg-sky-100 border border-sky-300 text-sky-800 hover:bg-sky-200 text-[9px] sm:text-[10px] font-bold px-2 py-1 rounded-lg transition shrink-0">Cold Draw</button>
+                <button id="blueDrawBtn" onclick="requestDraw('blue')" class="bg-sky-100 border border-sky-300 text-sky-800 hover:bg-sky-200 text-[9px] sm:text-[10px] font-bold px-2 py-1 rounded-lg transition shrink-0">Cold Draw</button>
             </div>
         </div>
 
@@ -304,6 +326,19 @@
         </div>
 
     </main>
+
+    <!-- Confirmation & Online Warning Dialog Modal -->
+    <div id="confirmModal" class="fixed inset-0 bg-black/70 backdrop-blur-md z-50 flex items-center justify-center p-3 hidden">
+        <div class="theme-card border rounded-2xl max-w-sm w-full p-4 sm:p-5 shadow-2xl space-y-3 text-center">
+            <div class="flex justify-center text-3xl" id="confirmIcon">⚠️</div>
+            <h2 id="confirmTitle" class="text-sm sm:text-base font-bold text-[var(--text-main)] uppercase tracking-wide">Action Confirmation</h2>
+            <p id="confirmMessage" class="text-xs text-[var(--text-muted)] leading-relaxed">Are you sure you want to proceed with this action?</p>
+            <div class="flex gap-2 pt-2">
+                <button id="confirmCancelBtn" onclick="closeConfirmModal(false)" class="flex-1 theme-subcard border text-[var(--text-main)] font-bold py-2 rounded-xl text-xs hover:opacity-80 transition">Cancel</button>
+                <button id="confirmOkBtn" onclick="closeConfirmModal(true)" class="flex-1 theme-btn-accent font-bold py-2 rounded-xl text-xs shadow hover:opacity-90 transition">Confirm</button>
+            </div>
+        </div>
+    </div>
 
     <!-- Theme Palette Switcher Modal -->
     <div id="paletteModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-3 hidden">
@@ -382,7 +417,7 @@
             <div class="text-[11px] sm:text-xs text-[var(--text-main)] space-y-2.5 leading-relaxed">
                 <p><strong>1. Objective:</strong> Compare rational numbers through binary operations to accumulate positive aroma points (Dark Roast) or negative points (Cold Brew).</p>
                 <p><strong>2. Turns:</strong> Dark Roast (+) pieces move first, followed by Cold Brew (-) pieces in alternating turns.</p>
-                <p><strong>3. First Move (Center Pieces):</strong> Pieces initially in the center can move directly into box 'a' or box 'b' of that <em>same rectangle</em> or into an adjacent rectangle on their first turn.</p>
+                <p><strong>3. Any Piece Mobility:</strong> All pieces on the board—whether starting from center or boxes 'a' and 'b'—can advance forward or move to adjacent valid tiles according to board connectivity and alternating tile color rules.</p>
                 <p><strong>4. Rectangle Color Rule (Boxes a & b):</strong> A single rectangle cannot contain two pieces of the same color across boxes 'a' and 'b'. Once one box is occupied, the other is off-limits to pieces of that same color.</p>
                 <p><strong>5. Infinity Pieces:</strong> Reaching infinity zones (+∞ ROAST DOMAIN or -∞ COLD DOMAIN) or yielding infinity converts a piece to ∞, allowing rook-like unobstructed movement across rows and columns.</p>
                 <p><strong>6. Binary Operations:</strong> When opposing pieces meet in a rectangle (one in 'a', one in 'b'), a binary operation is triggered. Positive results credit Dark Roast, negative credit Cold Brew. Zero or indeterminate results eliminate both pieces.</p>
@@ -536,6 +571,8 @@
             moveNumber: 1,
             logs: [],
             board: {},
+            history: [],       // Move history stack for Undo
+            redoStack: [],     // Redo stack for Next
             gameMode: '2p',
             botDifficulty: 'medium',
             playerSide: 'red',
@@ -543,6 +580,8 @@
             onlineRole: null,
             supabaseChannel: null
         };
+
+        let confirmCallback = null;
 
         function setTheme(themeName) {
             document.body.setAttribute('data-theme', themeName);
@@ -687,6 +726,8 @@
                         gameState.gameStarted = payload.gameStarted;
                         gameState.gamePaused = payload.gamePaused;
                         gameState.logs = payload.logs || [];
+                        gameState.history = payload.history || [];
+                        gameState.redoStack = payload.redoStack || [];
 
                         deserializeBoard(payload.board);
                         renderBoard();
@@ -703,6 +744,44 @@
                         if (gameState.onlineRole === 'host') {
                             document.getElementById('roomStatusText').innerText = "Guest connected! Both players click Ready.";
                             syncOnlineState(true);
+                        }
+                    })
+                    .on('broadcast', { event: 'draw_offer' }, ({ payload }) => {
+                        if (payload.from !== gameState.playerSide) {
+                            const senderName = payload.from === 'red' ? "Dark Roast (+)" : "Cold Brew (-)";
+                            openConfirmModal(
+                                "🤝",
+                                "Draw Offer Received",
+                                `${senderName} has offered a draw. Do you accept the draw match result?`,
+                                (accepted) => {
+                                    if (accepted) {
+                                        gameState.gameStarted = false;
+                                        showStatus("Match ended in a Draw by mutual agreement!");
+                                        logNotation('neutral', 'DRAW', 'Match ended in a Draw.');
+                                        renderBoard();
+                                        syncOnlineState();
+                                    } else {
+                                        showStatus("You declined the draw offer.");
+                                    }
+                                }
+                            );
+                        }
+                    })
+                    .on('broadcast', { event: 'reset_request' }, ({ payload }) => {
+                        if (payload.from !== gameState.playerSide) {
+                            const senderName = payload.from === 'red' ? "Dark Roast (+)" : "Cold Brew (-)";
+                            openConfirmModal(
+                                "🔄",
+                                "Reset Requested",
+                                `${senderName} requested to reset the match. Do you agree to reset?`,
+                                (accepted) => {
+                                    if (accepted) {
+                                        executeReset();
+                                    } else {
+                                        showStatus("Reset request declined.");
+                                    }
+                                }
+                            );
                         }
                     })
                     .subscribe((status, err) => {
@@ -751,11 +830,30 @@
                         gameStarted: gameState.gameStarted,
                         gamePaused: gameState.gamePaused,
                         logs: gameState.logs,
+                        history: gameState.history,
+                        redoStack: gameState.redoStack,
                         guestJoined: guestJoined
                     }
                 });
             } catch (e) {
                 console.debug("Supabase Broadcast Error:", e);
+            }
+        }
+
+        function openConfirmModal(icon, title, message, onResult) {
+            document.getElementById('confirmIcon').innerText = icon || "⚠️";
+            document.getElementById('confirmTitle').innerText = title || "Action Confirmation";
+            document.getElementById('confirmMessage').innerText = message;
+            confirmCallback = onResult;
+            toggleModal('confirmModal', true);
+        }
+
+        function closeConfirmModal(result) {
+            toggleModal('confirmModal', false);
+            if (confirmCallback) {
+                const cb = confirmCallback;
+                confirmCallback = null;
+                cb(result);
             }
         }
 
@@ -793,9 +891,91 @@
             }
         }
 
+        function createSnapshot() {
+            return {
+                board: serializeBoard(),
+                turn: gameState.turn,
+                redScore: gameState.redScore,
+                blueScore: gameState.blueScore,
+                redTime: gameState.redTime,
+                blueTime: gameState.blueTime,
+                logs: [...gameState.logs]
+            };
+        }
+
+        function restoreSnapshot(snapshot) {
+            if (!snapshot) return;
+            deserializeBoard(snapshot.board);
+            gameState.turn = snapshot.turn;
+            gameState.redScore = snapshot.redScore;
+            gameState.blueScore = snapshot.blueScore;
+            gameState.redTime = snapshot.redTime;
+            gameState.blueTime = snapshot.blueTime;
+            gameState.logs = [...snapshot.logs];
+            gameState.selectedPiece = null;
+        }
+
+        function undoMove() {
+            if (gameState.history.length === 0) return;
+            
+            if (gameState.gameMode === 'online') {
+                if (gameState.turn === gameState.playerSide) {
+                    showStatus("You can only undo after your move or with agreement.");
+                }
+            }
+
+            // Save current state to redoStack
+            const currentSnap = createSnapshot();
+            gameState.redoStack.push(currentSnap);
+
+            // Pop previous state from history
+            const prevSnap = gameState.history.pop();
+            restoreSnapshot(prevSnap);
+
+            showStatus("Move undone!");
+            renderBoard();
+            if (gameState.gameMode === 'online') syncOnlineState();
+        }
+
+        function redoMove() {
+            if (gameState.redoStack.length === 0) return;
+
+            // Save current state to history
+            const currentSnap = createSnapshot();
+            gameState.history.push(currentSnap);
+
+            // Pop future state from redoStack
+            const nextSnap = gameState.redoStack.pop();
+            restoreSnapshot(nextSnap);
+
+            showStatus("Move redone!");
+            renderBoard();
+            if (gameState.gameMode === 'online') syncOnlineState();
+        }
+
         function toggleReadyState() {
             if (gameState.gameStarted) return;
 
+            if (gameState.gameMode === 'online') {
+                const mySideReady = gameState.playerSide === 'red' ? gameState.redReady : gameState.blueReady;
+                if (!mySideReady) {
+                    openConfirmModal(
+                        "🏁",
+                        "Confirm Ready State",
+                        "Are you ready to start the online match? Timer will begin when opponent is ready.",
+                        (confirmed) => {
+                            if (confirmed) executeToggleReady();
+                        }
+                    );
+                } else {
+                    executeToggleReady();
+                }
+            } else {
+                executeToggleReady();
+            }
+        }
+
+        function executeToggleReady() {
             if (gameState.gameMode === 'online') {
                 if (gameState.playerSide === 'red') {
                     gameState.redReady = !gameState.redReady;
@@ -834,6 +1014,23 @@
             if (!gameState.gameStarted) return;
 
             if (gameState.gameMode === 'online') {
+                const myPaused = gameState.playerSide === 'red' ? gameState.redPaused : gameState.bluePaused;
+                const actionText = myPaused ? "Resume / Unpause" : "Pause";
+                openConfirmModal(
+                    "⏸️",
+                    `Confirm ${actionText}`,
+                    `Are you sure you want to ${actionText.toLowerCase()} the online match? The opponent will be notified.`,
+                    (confirmed) => {
+                        if (confirmed) executeTogglePause();
+                    }
+                );
+            } else {
+                executeTogglePause();
+            }
+        }
+
+        function executeTogglePause() {
+            if (gameState.gameMode === 'online') {
                 if (gameState.playerSide === 'red') {
                     gameState.redPaused = !gameState.redPaused;
                 } else {
@@ -862,6 +1059,100 @@
             }
 
             renderBoard();
+            if (gameState.gameMode === 'online') syncOnlineState();
+        }
+
+        function requestDraw(side) {
+            if (!gameState.gameStarted) {
+                showStatus("Game has not started yet.");
+                return;
+            }
+
+            if (gameState.gameMode === 'online') {
+                if (side !== gameState.playerSide) {
+                    showStatus("You can only offer draw on behalf of your side.");
+                    return;
+                }
+                openConfirmModal(
+                    "🤝",
+                    "Offer Draw",
+                    "Are you sure you want to offer a draw to your opponent?",
+                    (confirmed) => {
+                        if (confirmed && gameState.supabaseChannel) {
+                            gameState.supabaseChannel.send({
+                                type: 'broadcast',
+                                event: 'draw_offer',
+                                payload: { from: gameState.playerSide }
+                            });
+                            showStatus("Draw offer sent to opponent...");
+                        }
+                    }
+                );
+            } else {
+                openConfirmModal(
+                    "🤝",
+                    "Confirm Draw Result",
+                    `Agree to declare a Draw for both sides?`,
+                    (confirmed) => {
+                        if (confirmed) {
+                            gameState.gameStarted = false;
+                            showStatus("Match declared a Draw!");
+                            logNotation('neutral', 'DRAW', 'Match ended in a Draw.');
+                            renderBoard();
+                        }
+                    }
+                );
+            }
+        }
+
+        function confirmResetMatch() {
+            if (gameState.gameMode === 'online') {
+                openConfirmModal(
+                    "🔄",
+                    "Request Match Reset",
+                    "Are you sure you want to reset the match? Opponent will be asked to confirm.",
+                    (confirmed) => {
+                        if (confirmed && gameState.supabaseChannel) {
+                            gameState.supabaseChannel.send({
+                                type: 'broadcast',
+                                event: 'reset_request',
+                                payload: { from: gameState.playerSide }
+                            });
+                            showStatus("Reset request sent to opponent...");
+                        }
+                    }
+                );
+            } else {
+                openConfirmModal(
+                    "⚠️",
+                    "Reset Match",
+                    "Are you sure you want to reset the entire match and clear score history?",
+                    (confirmed) => {
+                        if (confirmed) executeReset();
+                    }
+                );
+            }
+        }
+
+        function executeReset() {
+            if (gameState.timerInterval) clearInterval(gameState.timerInterval);
+            gameState.gameStarted = false;
+            gameState.gamePaused = false;
+            gameState.redReady = false;
+            gameState.blueReady = false;
+            gameState.redPaused = false;
+            gameState.bluePaused = false;
+            gameState.turn = 'red';
+            gameState.redScore = 0;
+            gameState.blueScore = 0;
+            gameState.redTime = 15 * 60;
+            gameState.blueTime = 15 * 60;
+            gameState.logs = [];
+            gameState.history = [];
+            gameState.redoStack = [];
+            initBoard();
+            renderBoard();
+            showStatus("Table reset. Both players click Ready to begin.");
             if (gameState.gameMode === 'online') syncOnlineState();
         }
 
@@ -1038,7 +1329,7 @@
                         }
                     };
 
-                    // Center section (Starts with pieces, or displays operation)
+                    // Center section
                     const centerEl = document.createElement('div');
                     centerEl.style.width = '0.85cm';
                     centerEl.style.height = '1.1cm';
@@ -1047,7 +1338,10 @@
                     if (rect.centerPiece) {
                         const p = rect.centerPiece;
                         const isCenterSelected = isSelected && gameState.selectedPiece.fromBox === 'center';
-                        const pBg = p.color === 'red' ? 'bg-rose-700 text-white' : 'bg-sky-600 text-white';
+                        let pBg = p.color === 'red' ? 'bg-rose-700 text-white' : 'bg-sky-600 text-white';
+                        if (p.isInf || p.label.includes('∞')) {
+                            pBg = p.label.includes('+') ? 'bg-rose-700 text-white' : 'bg-sky-700 text-white';
+                        }
                         const isInfText = p.isInf || p.label.includes('∞');
                         centerEl.className += ` ${pBg} rounded-lg shadow font-board ${isInfText ? 'text-xs font-black' : 'text-xs font-bold'} flex items-center justify-center ${isCenterSelected ? 'ring-2 ring-amber-300 ring-offset-1 scale-105' : ''}`;
                         centerEl.innerText = p.label;
@@ -1154,14 +1448,26 @@
                 }
             }
 
+            // Dynamic Pause / Resume Button text and color indicator
             const pauseBtn = document.getElementById('pauseBtn');
             if (pauseBtn) {
-                const myPaused = gameState.playerSide === 'red' ? gameState.redPaused : gameState.bluePaused;
-                pauseBtn.innerText = myPaused ? "Resume / Unpause" : "Pause";
+                if (gameState.gamePaused) {
+                    pauseBtn.innerText = "Resume";
+                    pauseBtn.className = "bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] sm:text-xs font-bold px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg transition shadow-sm shrink-0 animate-pulse";
+                } else {
+                    pauseBtn.innerText = "Pause";
+                    pauseBtn.className = "bg-amber-700 hover:bg-amber-800 text-white text-[10px] sm:text-xs font-bold px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg transition shadow-sm shrink-0";
+                }
             }
+
+            // Undo & Redo (Next) Buttons Disabled State
+            const undoBtn = document.getElementById('undoBtn');
+            const redoBtn = document.getElementById('redoBtn');
+            if (undoBtn) undoBtn.disabled = gameState.history.length === 0;
+            if (redoBtn) redoBtn.disabled = gameState.redoStack.length === 0;
         }
 
-        // Perfect Responsive Board Auto Scaler - guarantees zero scrollbars
+        // Responsive Board Auto Scaler
         function autoScaleBoard() {
             const scaler = document.getElementById('boardScaler');
             const viewport = document.getElementById('boardViewport');
@@ -1181,8 +1487,8 @@
             const scaleY = availH / boardH;
 
             let scale = Math.min(scaleX, scaleY);
-            scale = Math.min(scale, 1.0); // Never enlarge past original size
-            scale = Math.max(scale, 0.2); // Avoid negative or zero scale
+            scale = Math.min(scale, 1.0);
+            scale = Math.max(scale, 0.2);
 
             scaler.style.transform = `scale(${scale})`;
         }
@@ -1190,24 +1496,15 @@
         window.addEventListener('resize', autoScaleBoard);
         window.addEventListener('orientationchange', () => setTimeout(autoScaleBoard, 150));
 
-        /* 
-         * FIX 2 IMPLEMENTATION: Movement logic supporting center piece first-move!
-         */
-        function isValidMove(fromRow, fromRect, fromBox, toRow, toRect, piece) {
+        function isValidMove(fromRow, fromRect, fromBox, toRow, toRect, piece, toBox = 'center') {
             const fromOrd = ROW_ORDER_MAP[fromRow];
             const toOrd = ROW_ORDER_MAP[toRow];
 
-            // 1. First-move exception: If piece is in the center placement of the rectangle,
-            // moving to box 'a' or box 'b' of THAT SAME rectangle is EXPLICITLY VALID!
             if (fromRow === toRow && fromRect === toRect) {
-                if (fromBox === 'center') {
-                    return true;
-                }
-                // Once a piece is inside box 'a' or 'b', moving within the same rectangle is not allowed.
+                if (fromBox !== toBox) return true;
                 return false;
             }
 
-            // 2. Cannot occupy a box if your own color is already in that rectangle's other box, or both boxes are full
             if (toRow !== 'K' && toRow !== 'A') {
                 const destRect = gameState.board[`${toRow}-${toRect}`];
                 if (destRect) {
@@ -1219,9 +1516,7 @@
                 }
             }
 
-            // 3. Infinity piece rook-like linear movement
             if (piece.isInf) {
-                if (fromRow === toRow && fromRect === toRect) return false;
                 if (fromRow === toRow) {
                     const minR = Math.min(fromRect, toRect);
                     const maxR = Math.max(fromRect, toRect);
@@ -1247,22 +1542,20 @@
                 return false;
             }
 
-            // 4. Directional enforcement (Cannot move backward)
             if (piece.color === 'red' && toOrd < fromOrd) return false;
             if (piece.color === 'blue' && toOrd > fromOrd) return false;
 
             const rowDiff = Math.abs(toOrd - fromOrd);
             const rectDiff = Math.abs(toRect - fromRect);
 
-            // Maximum step distance is 1 rectangle (forward or sideward, no diagonals)
-            if (rowDiff > 1 || rectDiff > 1 || (rowDiff === 1 && rectDiff === 1)) return false;
+            if (rowDiff > 1 || rectDiff > 1 || (rowDiff === 1 && rectDiff === 1)) {
+                if (rowDiff !== 1 || rectDiff > 1) return false;
+            }
 
-            // 5. Alternating tile color rule (Dark to Light or Light to Dark)
-            // Exemption: If starting from initial 'center' placement, allow entry to adjacent tile without tile color restriction
-            if (fromBox !== 'center') {
+            if (fromBox !== 'center' && fromRow !== toRow) {
                 const fromGreen = (fromRow === 'K' || fromRow === 'A') ? false : gameState.board[`${fromRow}-${fromRect}`]?.isGreen;
                 const toGreen = (toRow === 'K' || toRow === 'A') ? false : gameState.board[`${toRow}-${toRect}`]?.isGreen;
-                if (fromGreen === toGreen) return false;
+                if (fromGreen === toGreen && rectDiff > 0) return false;
             }
 
             return true;
@@ -1271,6 +1564,11 @@
         function handlePieceSelect(rowName, rectIdx, fromBox = 'center') {
             if (!gameState.gameStarted) {
                 showStatus("Both players must click Ready to start!");
+                return;
+            }
+
+            if (gameState.gamePaused) {
+                showStatus("Game is paused. Click Resume to continue.");
                 return;
             }
 
@@ -1306,12 +1604,12 @@
             }
 
             gameState.selectedPiece = { rowName, rectIdx, fromBox, piece };
-            showStatus(`Selected piece [${piece.label}]. Click box 'a' or 'b' to place it.`);
+            showStatus(`Selected piece [${piece.label}]. Click target tile, center, or box 'a'/'b' to move.`);
             renderBoard();
         }
 
         function handleBoxClick(rowName, rectIdx, box) {
-            if (!gameState.gameStarted) return;
+            if (!gameState.gameStarted || gameState.gamePaused) return;
             if (gameState.gameMode === 'bot' && gameState.turn !== gameState.playerSide) return;
             if (gameState.gameMode === 'online' && gameState.turn !== gameState.playerSide) return;
 
@@ -1334,8 +1632,9 @@
 
             const sel = gameState.selectedPiece;
             const targetBoxPiece = box === 'a' ? rect.aPiece : rect.bPiece;
-            if (targetBoxPiece !== null) {
-                showStatus(`Box (${box}) is already occupied!`);
+            
+            if (targetBoxPiece !== null && targetBoxPiece.color === sel.piece.color) {
+                showStatus(`Box (${box}) is already occupied by your piece!`);
                 return;
             }
 
@@ -1345,7 +1644,7 @@
                 return;
             }
 
-            if (isValidMove(sel.rowName, sel.rectIdx, sel.fromBox, rowName, rectIdx, sel.piece)) {
+            if (isValidMove(sel.rowName, sel.rectIdx, sel.fromBox, rowName, rectIdx, sel.piece, box)) {
                 executeMove(sel.rowName, sel.rectIdx, sel.fromBox, rowName, rectIdx, box);
             } else {
                 showStatus("Invalid move! Follow forward/sideward rules.");
@@ -1353,7 +1652,7 @@
         }
 
         function handleTargetRectClick(rowName, rectIdx) {
-            if (!gameState.gameStarted || !gameState.selectedPiece) return;
+            if (!gameState.gameStarted || gameState.gamePaused || !gameState.selectedPiece) return;
             if (gameState.gameMode === 'bot' && gameState.turn !== gameState.playerSide) return;
             if (gameState.gameMode === 'online' && gameState.turn !== gameState.playerSide) return;
 
@@ -1398,7 +1697,7 @@
         }
 
         function handleInfZoneClick(zone) {
-            if (!gameState.gameStarted || !gameState.selectedPiece) return;
+            if (!gameState.gameStarted || gameState.gamePaused || !gameState.selectedPiece) return;
             if (gameState.gameMode === 'bot' && gameState.turn !== gameState.playerSide) return;
             if (gameState.gameMode === 'online' && gameState.turn !== gameState.playerSide) return;
 
@@ -1412,6 +1711,11 @@
         }
 
         function executeMove(fromRow, fromRect, fromBox, toRow, toRect, boxChoice) {
+            // Push current state to History for Undo functionality
+            gameState.history.push(createSnapshot());
+            // Clear redoStack on new move execution
+            gameState.redoStack = [];
+
             const fromKey = (fromRow === 'K' || fromRow === 'A') ? `${fromRow}-0` : `${fromRow}-${fromRect}`;
             const toKey = (toRow === 'K' || toRow === 'A') ? `${toRow}-0` : `${toRow}-${toRect}`;
             const fromRectObj = gameState.board[fromKey];
@@ -1431,9 +1735,9 @@
 
             if ((piece.color === 'red' && toRow === 'K') || (piece.color === 'blue' && toRow === 'A')) {
                 piece.isInf = true;
-                piece.label = piece.color === 'red' ? '+∞' : '-∞';
-                if (piece.color === 'red') gameState.redScore += 10;
-                else gameState.blueScore += 10;
+                piece.label = '+∞';
+                piece.color = 'red';
+                gameState.redScore += 10;
                 toRectObj.centerPiece = piece;
                 logNotation(gameState.turn, `Move ${gameState.logs.length + 1}: ${piece.label}-${toRow}`, "Infinity Domain Reached (+10 pts)");
             } else if (toRow === 'K' || toRow === 'A') {
@@ -1505,16 +1809,10 @@
                     } else if (aVal === Infinity || aVal === -Infinity) {
                         result = aVal;
                     } else {
-                        result = aVal > 0 ? Infinity : -Infinity;
+                        result = aVal >= 0 ? Infinity : -Infinity;
                     }
                 } else if (bVal === Infinity || bVal === -Infinity) {
-                    if (aVal === 0 || (!isNaN(aVal) && isFinite(aVal))) {
-                        rectObj.aPiece = null;
-                        rectObj.bPiece = null;
-                        return `Op: (${aPiece.label} ÷ ${bPiece.label}) = k/∞ → Result is 0, both pieces eliminated, no points awarded.`;
-                    } else {
-                        result = NaN;
-                    }
+                    result = 0;
                 } else if (aVal === 0) {
                     result = 0;
                 } else if (aVal === Infinity || aVal === -Infinity) {
@@ -1530,12 +1828,17 @@
                 return `Op: (${aPiece.label} ${op} ${bPiece.label}) = Indeterminate → Both pieces eliminated.`;
             }
 
+            const landingBoxKey = landingBox === 'a' ? 'aPiece' : 'bPiece';
+            const defendingBoxKey = landingBox === 'a' ? 'bPiece' : 'aPiece';
+
             if (result === Infinity || result === -Infinity) {
                 movingPiece.isInf = true;
                 movingPiece.label = result === Infinity ? '+∞' : '-∞';
-                rectObj[landingBox === 'a' ? 'aPiece' : 'bPiece'] = movingPiece;
-                rectObj[oppBox] = null;
-                return `Infinity yielded! Converted to ${movingPiece.label}.`;
+                movingPiece.color = result === Infinity ? 'red' : 'blue';
+                
+                rectObj[landingBoxKey] = movingPiece;
+                rectObj[defendingBoxKey] = null;
+                return `Infinity yielded! Converted to ${movingPiece.label} in box (${landingBox}).`;
             } else if (result > 0) {
                 resultType = 'positive';
             } else if (result < 0) {
@@ -1546,22 +1849,22 @@
 
             if (resultType === 'positive') {
                 gameState.redScore += Math.abs(result);
-                rectObj[landingBox === 'a' ? 'aPiece' : 'bPiece'] = movingPiece;
-                rectObj[oppBox] = null;
+                rectObj[landingBoxKey] = movingPiece;
+                rectObj[defendingBoxKey] = null;
             } else if (resultType === 'negative') {
                 gameState.blueScore += Math.abs(result);
-                rectObj[landingBox === 'a' ? 'aPiece' : 'bPiece'] = movingPiece;
-                rectObj[oppBox] = null;
+                rectObj[landingBoxKey] = movingPiece;
+                rectObj[defendingBoxKey] = null;
             } else {
                 rectObj.aPiece = null;
                 rectObj.bPiece = null;
             }
 
-            return `Op: (${aPiece.label} ${op} ${bPiece.label}) = ${formatVal(result)} → ${resultType === 'positive' ? 'Red Points, Opponent Eliminated' : resultType === 'negative' ? 'Blue Points, Opponent Eliminated' : 'Both Eliminated'}`;
+            return `Op: (${aPiece.label} ${op} ${bPiece.label}) = ${formatVal(result)} → ${resultType === 'positive' ? 'Dark Roast Points' : resultType === 'negative' ? 'Cold Brew Points' : 'Both Eliminated'}`;
         }
 
         function runBotTurn() {
-            if (!gameState.gameStarted || gameState.turn === gameState.playerSide) return;
+            if (!gameState.gameStarted || gameState.gamePaused || gameState.turn === gameState.playerSide) return;
 
             const botColor = gameState.turn;
             let allMoves = [];
@@ -1627,7 +1930,7 @@
             if (container) {
                 container.innerHTML = gameState.logs.map(l => `
                     <div class="theme-card p-1 rounded-lg border text-[10px]">
-                        <div class="${l.player === 'red' ? 'text-rose-600 font-black' : 'text-sky-600 font-black'}">${l.moveStr}</div>
+                        <div class="${l.player === 'red' ? 'text-rose-600 font-black' : l.player === 'blue' ? 'text-sky-600 font-black' : 'text-amber-600 font-black'}">${l.moveStr}</div>
                         <div class="text-[var(--text-muted)] text-[9px] mt-0.5 leading-tight">${l.detailStr}</div>
                     </div>
                 `).join('');
@@ -1648,26 +1951,7 @@
 
         document.getElementById('readyBtn').onclick = () => toggleReadyState();
         document.getElementById('pauseBtn').onclick = () => togglePauseState();
-
-        document.getElementById('resetBtn').onclick = () => {
-            if (gameState.timerInterval) clearInterval(gameState.timerInterval);
-            gameState.gameStarted = false;
-            gameState.gamePaused = false;
-            gameState.redReady = false;
-            gameState.blueReady = false;
-            gameState.redPaused = false;
-            gameState.bluePaused = false;
-            gameState.turn = 'red';
-            gameState.redScore = 0;
-            gameState.blueScore = 0;
-            gameState.redTime = 15 * 60;
-            gameState.blueTime = 15 * 60;
-            gameState.logs = [];
-            initBoard();
-            renderBoard();
-            showStatus("Table reset. Both players click Ready to begin.");
-            if (gameState.gameMode === 'online') syncOnlineState();
-        };
+        document.getElementById('resetBtn').onclick = () => confirmResetMatch();
 
         function toggleModal(modalId, show) {
             const m = document.getElementById(modalId);
