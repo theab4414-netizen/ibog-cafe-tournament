@@ -190,7 +190,7 @@
 
         <!-- Scrollable Mobile Button Action Bar -->
         <div class="flex items-center gap-1 overflow-x-auto no-scrollbar py-0.5 max-w-[75vw] sm:max-w-none">
-            <button id="startBtn" class="bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] sm:text-xs font-bold px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg transition shadow-sm shrink-0">Start</button>
+            <button id="readyBtn" class="bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] sm:text-xs font-bold px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg transition shadow-sm shrink-0">Ready / Start</button>
             <button id="pauseBtn" class="bg-amber-700 hover:bg-amber-800 text-white text-[10px] sm:text-xs font-bold px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg transition shadow-sm shrink-0">Pause</button>
             <button id="configBtn" class="theme-btn-accent text-[10px] sm:text-xs font-bold px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg transition shadow-sm flex items-center gap-0.5 shrink-0">
                 <span>⚙️</span> <span class="hidden xs:inline">Setup</span>
@@ -214,15 +214,15 @@
             <!-- Sticky / Top Bar for Turn Indicator & Draw Offers -->
             <div class="grid grid-cols-3 items-center w-full mb-1.5 px-1 shrink-0 gap-1">
                 <div class="text-[9px] sm:text-[11px] font-bold text-[var(--text-muted)] flex items-center justify-start gap-1 shrink-0">
-                    <span class="w-2.5 h-2.5 rounded-full bg-sky-500 inline-block"></span> <span class="hidden xs:inline">Cold Brew</span> (-)
+                    <span class="w-2.5 h-2.5 rounded-full bg-sky-500 inline-block"></span> <span class="hidden xs:inline">Cold Brew</span> (-) <span id="blueReadyBadge" class="text-[8px] bg-slate-200 text-slate-700 px-1 py-0.5 rounded ml-1">Not Ready</span>
                 </div>
                 <div class="flex justify-center items-center">
                     <div id="turnIndicator" class="px-3 py-1 rounded-full text-[10px] sm:text-xs font-extrabold theme-btn-accent uppercase tracking-wider shadow-sm text-center truncate">
                         TURN: DARK ROAST (+)
                     </div>
                 </div>
-                <div class="flex justify-end items-center">
-                    <button id="blueDrawBtn" class="bg-sky-100 border border-sky-300 text-sky-800 hover:bg-sky-200 text-[9px] sm:text-[10px] font-bold px-2 py-1 rounded-lg transition shrink-0">Cold Draw</button>
+                <div class="text-[9px] sm:text-[11px] font-bold text-[var(--text-muted)] flex items-center justify-end gap-1 shrink-0">
+                    <span id="redReadyBadge" class="text-[8px] bg-slate-200 text-slate-700 px-1 py-0.5 rounded mr-1">Not Ready</span> <span class="hidden xs:inline">Dark Roast</span> (+) <span class="w-2.5 h-2.5 rounded-full bg-rose-600 inline-block"></span>
                 </div>
             </div>
 
@@ -240,11 +240,9 @@
             <div class="flex justify-between items-center w-full mt-1.5 px-1 shrink-0 gap-1">
                 <button id="redDrawBtn" class="bg-rose-100 border border-rose-300 text-rose-800 hover:bg-rose-200 text-[9px] sm:text-[10px] font-bold px-2 py-1 rounded-lg transition shrink-0">Roast Draw</button>
                 <div id="statusMessage" class="text-[10px] sm:text-[11px] text-center text-[var(--text-muted)] theme-subcard px-2.5 py-1 rounded-xl border flex-1 max-w-sm font-medium truncate mx-1">
-                    Table ready. Click Start to begin brewing moves!
+                    Table ready. Both players click Ready to start!
                 </div>
-                <div class="text-[9px] sm:text-[11px] font-bold text-[var(--text-muted)] flex items-center gap-1 shrink-0">
-                    <span class="hidden xs:inline">Dark Roast</span> (+) <span class="w-2.5 h-2.5 rounded-full bg-rose-600 inline-block"></span>
-                </div>
+                <button id="blueDrawBtn" class="bg-sky-100 border border-sky-300 text-sky-800 hover:bg-sky-200 text-[9px] sm:text-[10px] font-bold px-2 py-1 rounded-lg transition shrink-0">Cold Draw</button>
             </div>
         </div>
 
@@ -524,6 +522,8 @@
             blueScore: 0,
             redTime: 15 * 60,
             blueTime: 15 * 60,
+            redReady: false,
+            blueReady: false,
             timerInterval: null,
             selectedPiece: null,
             moveNumber: 1,
@@ -600,7 +600,7 @@
             if (gameState.gameMode === 'online') {
                 toggleModal('onlineModal', true);
             } else {
-                showStatus(gameState.gameMode === '2p' ? "2P Face-to-Face ready! Click Start." : "Barista Bot ready! Click Start.");
+                showStatus(gameState.gameMode === '2p' ? "2P Face-to-Face ready! Click Ready to begin." : "Barista Bot ready! Click Ready to start.");
             }
         }
 
@@ -668,6 +668,8 @@
                     gameState.blueScore = payload.blueScore;
                     gameState.redTime = payload.redTime;
                     gameState.blueTime = payload.blueTime;
+                    gameState.redReady = payload.redReady;
+                    gameState.blueReady = payload.blueReady;
                     gameState.gameStarted = payload.gameStarted;
                     gameState.gamePaused = payload.gamePaused;
                     gameState.logs = payload.logs || [];
@@ -675,13 +677,17 @@
                     deserializeBoard(payload.board);
                     renderBoard();
 
+                    if (gameState.gameStarted && !gameState.timerInterval) {
+                        startTimer();
+                    }
+
                     if (payload.guestJoined && gameState.onlineRole === 'host') {
-                        document.getElementById('roomStatusText').innerText = "Guest connected! Match ready.";
+                        document.getElementById('roomStatusText').innerText = "Guest connected! Both players click Ready.";
                     }
                 })
                 .on('broadcast', { event: 'guest_join' }, () => {
                     if (gameState.onlineRole === 'host') {
-                        document.getElementById('roomStatusText').innerText = "Guest connected! Match ready.";
+                        document.getElementById('roomStatusText').innerText = "Guest connected! Both players click Ready.";
                         syncOnlineState(true);
                     }
                 })
@@ -712,6 +718,8 @@
                         blueScore: gameState.blueScore,
                         redTime: gameState.redTime,
                         blueTime: gameState.blueTime,
+                        redReady: gameState.redReady,
+                        blueReady: gameState.blueReady,
                         gameStarted: gameState.gameStarted,
                         gamePaused: gameState.gamePaused,
                         logs: gameState.logs,
@@ -757,6 +765,33 @@
             }
         }
 
+        function toggleReadyState() {
+            if (gameState.gameStarted) return;
+
+            if (gameState.gameMode === 'online') {
+                if (gameState.playerSide === 'red') {
+                    gameState.redReady = !gameState.redReady;
+                } else {
+                    gameState.blueReady = !gameState.blueReady;
+                }
+            } else {
+                gameState.redReady = true;
+                gameState.blueReady = true;
+            }
+
+            if (gameState.redReady && gameState.blueReady) {
+                gameState.gameStarted = true;
+                gameState.gamePaused = false;
+                startTimer();
+                showStatus("Both players ready! Match started. Dark Roast (+) moves first.");
+            } else {
+                showStatus(`Waiting for both players to click Ready...`);
+            }
+
+            renderBoard();
+            if (gameState.gameMode === 'online') syncOnlineState();
+        }
+
         function startTimer() {
             if (gameState.timerInterval) clearInterval(gameState.timerInterval);
             gameState.timerInterval = setInterval(() => {
@@ -777,7 +812,6 @@
                     }
                 }
                 updateTimerDisplay();
-                // FIX LAGGING: Don't trigger full network broadcast every second for the clock
             }, 1000);
         }
 
@@ -908,7 +942,6 @@
                     rectEl.style.cssText = `width: 3.2cm; height: 1.8cm; ${bgStyle}`;
                     rectEl.className = `rounded-xl border-2 flex items-center justify-between px-1 py-0.5 relative shadow-sm transition transform shrink-0 ${isSelected ? 'highlight-rect ring-4 ring-amber-400 z-10 scale-[1.02]' : ''}`;
 
-                    // FIX: Allow selecting pieces in box 'a' and box 'b' directly by setting click handlers properly
                     const boxAEl = document.createElement('div');
                     const hasAPiece = rect.aPiece !== null;
                     const isPieceASelected = isSelected && gameState.selectedPiece.fromBox === 'a';
@@ -921,7 +954,6 @@
                     boxAEl.className = `rounded-lg flex items-center justify-center font-board ${hasAPiece && (rect.aPiece.isInf || rect.aPiece.label.includes('∞')) ? 'text-xs font-black' : 'text-xs font-bold'} cursor-pointer transition shrink-0 ${boxABg} ${isPieceASelected ? 'ring-2 ring-amber-300 ring-offset-1 scale-105' : ''}`;
                     boxAEl.innerText = hasAPiece ? rect.aPiece.label : 'a';
                     
-                    // Box A Click logic
                     boxAEl.onclick = (e) => { 
                         e.stopPropagation(); 
                         if (hasAPiece) {
@@ -950,7 +982,6 @@
                         centerEl.onclick = (e) => { e.stopPropagation(); handleTargetRectClick(rowName, c); };
                     }
 
-                    // Box B Click logic
                     const boxBEl = document.createElement('div');
                     const hasBPiece = rect.bPiece !== null;
                     const isPieceBSelected = isSelected && gameState.selectedPiece.fromBox === 'b';
@@ -1009,6 +1040,34 @@
                 turnInd.innerText = "TURN: COLD BREW (-)";
             }
             document.getElementById('moveCount').innerText = `Brewed: ${gameState.logs.length}`;
+
+            // Update Readiness badges
+            const redBadge = document.getElementById('redReadyBadge');
+            const blueBadge = document.getElementById('blueReadyBadge');
+            
+            if (redBadge) {
+                redBadge.innerText = gameState.redReady ? "READY ✓" : "Not Ready";
+                redBadge.className = gameState.redReady ? "text-[8px] bg-emerald-600 text-white font-bold px-1 py-0.5 rounded mr-1" : "text-[8px] bg-slate-200 text-slate-700 px-1 py-0.5 rounded mr-1";
+            }
+            if (blueBadge) {
+                blueBadge.innerText = gameState.blueReady ? "READY ✓" : "Not Ready";
+                blueBadge.className = gameState.blueReady ? "text-[8px] bg-emerald-600 text-white font-bold px-1 py-0.5 rounded ml-1" : "text-[8px] bg-slate-200 text-slate-700 px-1 py-0.5 rounded ml-1";
+            }
+
+            const readyBtn = document.getElementById('readyBtn');
+            if (readyBtn) {
+                const mySideReady = gameState.playerSide === 'red' ? gameState.redReady : gameState.blueReady;
+                if (gameState.gameStarted) {
+                    readyBtn.innerText = "In Match";
+                    readyBtn.className = "bg-slate-500 text-white text-[10px] sm:text-xs font-bold px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg transition shadow-sm shrink-0 opacity-60";
+                } else if (mySideReady) {
+                    readyBtn.innerText = "Waiting...";
+                    readyBtn.className = "bg-amber-600 text-white text-[10px] sm:text-xs font-bold px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg transition shadow-sm shrink-0";
+                } else {
+                    readyBtn.innerText = "Ready / Start";
+                    readyBtn.className = "bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] sm:text-xs font-bold px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg transition shadow-sm shrink-0";
+                }
+            }
         }
 
         function autoScaleBoard() {
@@ -1107,7 +1166,7 @@
 
         function handlePieceSelect(rowName, rectIdx, fromBox = 'center') {
             if (!gameState.gameStarted) {
-                showStatus("Click Start to begin brewing moves!");
+                showStatus("Both players must click Ready to start!");
                 return;
             }
 
@@ -1438,13 +1497,7 @@
         document.getElementById('mechanicsBtn').onclick = () => toggleModal('mechanicsModal', true);
         document.getElementById('notationBtn').onclick = () => toggleModal('notationModal', true);
 
-        document.getElementById('startBtn').onclick = () => {
-            gameState.gameStarted = true;
-            gameState.gamePaused = false;
-            startTimer();
-            showStatus("Match started! Dark Roast (+) moves first.");
-            if (gameState.gameMode === 'online') syncOnlineState();
-        };
+        document.getElementById('readyBtn').onclick = () => toggleReadyState();
 
         document.getElementById('pauseBtn').onclick = () => {
             if (!gameState.gameStarted) return;
@@ -1459,6 +1512,8 @@
             if (gameState.timerInterval) clearInterval(gameState.timerInterval);
             gameState.gameStarted = false;
             gameState.gamePaused = false;
+            gameState.redReady = false;
+            gameState.blueReady = false;
             gameState.turn = 'red';
             gameState.redScore = 0;
             gameState.blueScore = 0;
@@ -1467,7 +1522,7 @@
             gameState.logs = [];
             initBoard();
             renderBoard();
-            showStatus("Table reset. Click Start to begin.");
+            showStatus("Table reset. Both players click Ready to begin.");
             if (gameState.gameMode === 'online') syncOnlineState();
         };
 
