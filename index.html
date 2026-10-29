@@ -214,7 +214,7 @@
             <!-- Sticky / Top Bar for Turn Indicator & Draw Offers -->
             <div class="grid grid-cols-3 items-center w-full mb-1.5 px-1 shrink-0 gap-1">
                 <div class="text-[9px] sm:text-[11px] font-bold text-[var(--text-muted)] flex items-center justify-start gap-1 shrink-0">
-                    <span class="w-2.5 h-2.5 rounded-full bg-sky-500 inline-block"></span> <span class="hidden xs:inline">Cold Brew</span> (-) <span id="blueReadyBadge" class="text-[8px] bg-slate-200 text-slate-700 px-1 py-0.5 rounded ml-1">Not Ready</span>
+                    <span class="w-2.5 h-2.5 rounded-full bg-sky-500 inline-block"></span> <span class="hidden xs:inline">Cold Brew</span> (-) <span id="blueReadyBadge" class="text-[8px] bg-slate-200 text-slate-700 px-1 py-0.5 rounded ml-1">Not Ready</span> <span id="bluePauseBadge" class="text-[8px] bg-slate-200 text-slate-700 px-1 py-0.5 rounded ml-1 hidden">Paused</span>
                 </div>
                 <div class="flex justify-center items-center">
                     <div id="turnIndicator" class="px-3 py-1 rounded-full text-[10px] sm:text-xs font-extrabold theme-btn-accent uppercase tracking-wider shadow-sm text-center truncate">
@@ -222,7 +222,7 @@
                     </div>
                 </div>
                 <div class="text-[9px] sm:text-[11px] font-bold text-[var(--text-muted)] flex items-center justify-end gap-1 shrink-0">
-                    <span id="redReadyBadge" class="text-[8px] bg-slate-200 text-slate-700 px-1 py-0.5 rounded mr-1">Not Ready</span> <span class="hidden xs:inline">Dark Roast</span> (+) <span class="w-2.5 h-2.5 rounded-full bg-rose-600 inline-block"></span>
+                    <span id="redPauseBadge" class="text-[8px] bg-slate-200 text-slate-700 px-1 py-0.5 rounded mr-1 hidden">Paused</span> <span id="redReadyBadge" class="text-[8px] bg-slate-200 text-slate-700 px-1 py-0.5 rounded mr-1">Not Ready</span> <span class="hidden xs:inline">Dark Roast</span> (+) <span class="w-2.5 h-2.5 rounded-full bg-rose-600 inline-block"></span>
                 </div>
             </div>
 
@@ -524,6 +524,8 @@
             blueTime: 15 * 60,
             redReady: false,
             blueReady: false,
+            redPaused: false,
+            bluePaused: false,
             timerInterval: null,
             selectedPiece: null,
             moveNumber: 1,
@@ -670,6 +672,8 @@
                     gameState.blueTime = payload.blueTime;
                     gameState.redReady = payload.redReady;
                     gameState.blueReady = payload.blueReady;
+                    gameState.redPaused = payload.redPaused;
+                    gameState.bluePaused = payload.bluePaused;
                     gameState.gameStarted = payload.gameStarted;
                     gameState.gamePaused = payload.gamePaused;
                     gameState.logs = payload.logs || [];
@@ -720,6 +724,8 @@
                         blueTime: gameState.blueTime,
                         redReady: gameState.redReady,
                         blueReady: gameState.blueReady,
+                        redPaused: gameState.redPaused,
+                        bluePaused: gameState.bluePaused,
                         gameStarted: gameState.gameStarted,
                         gamePaused: gameState.gamePaused,
                         logs: gameState.logs,
@@ -782,10 +788,11 @@
             if (gameState.redReady && gameState.blueReady) {
                 gameState.gameStarted = true;
                 gameState.gamePaused = false;
+                gameState.redPaused = false;
+                gameState.bluePaused = false;
                 startTimer();
                 showStatus("Both players ready! Match started. Dark Roast (+) moves first.");
             } else {
-                // Informative message indicating the other player is ready and waiting
                 const mySide = gameState.playerSide;
                 const otherPlayerReady = mySide === 'red' ? gameState.blueReady : gameState.redReady;
                 const otherPlayerName = mySide === 'red' ? "Cold Brew (-)" : "Dark Roast (+)";
@@ -795,6 +802,41 @@
                 } else {
                     showStatus("You are Ready. Waiting for the other player...");
                 }
+            }
+
+            renderBoard();
+            if (gameState.gameMode === 'online') syncOnlineState();
+        }
+
+        function togglePauseState() {
+            if (!gameState.gameStarted) return;
+
+            if (gameState.gameMode === 'online') {
+                if (gameState.playerSide === 'red') {
+                    gameState.redPaused = !gameState.redPaused;
+                } else {
+                    gameState.bluePaused = !gameState.bluePaused;
+                }
+
+                if (gameState.redPaused && gameState.bluePaused) {
+                    gameState.gamePaused = true;
+                    showStatus("Match is Paused by both players.");
+                } else if (!gameState.redPaused && !gameState.bluePaused) {
+                    gameState.gamePaused = false;
+                    showStatus("Match resumed by both players.");
+                } else {
+                    const mySide = gameState.playerSide;
+                    const otherPaused = mySide === 'red' ? gameState.bluePaused : gameState.redPaused;
+                    const otherName = mySide === 'red' ? "Cold Brew (-)" : "Dark Roast (+)";
+                    if (otherPaused) {
+                        showStatus(`${otherName} wants to Pause. Click Pause to confirm.`);
+                    } else {
+                        showStatus("You requested a Pause. Waiting for other player to click Pause.");
+                    }
+                }
+            } else {
+                gameState.gamePaused = !gameState.gamePaused;
+                showStatus(gameState.gamePaused ? "Match Paused." : "Match Resumed.");
             }
 
             renderBoard();
@@ -848,7 +890,7 @@
         }
 
         function parseVal(str) {
-            if (str === 'inf' || str === 'INF+') return Infinity;
+            if (str === '+inf' || str === 'inf' || str === 'INF+') return Infinity;
             if (str === '-inf' || str === 'INF-') return -Infinity;
             if (str.includes('/')) {
                 const parts = str.split('/');
@@ -1050,9 +1092,10 @@
             }
             document.getElementById('moveCount').innerText = `Brewed: ${gameState.logs.length}`;
 
-            // Update Readiness badges
             const redBadge = document.getElementById('redReadyBadge');
             const blueBadge = document.getElementById('blueReadyBadge');
+            const redPauseBadge = document.getElementById('redPauseBadge');
+            const bluePauseBadge = document.getElementById('bluePauseBadge');
             
             if (redBadge) {
                 redBadge.innerText = gameState.redReady ? "READY ✓" : "Not Ready";
@@ -1061,6 +1104,12 @@
             if (blueBadge) {
                 blueBadge.innerText = gameState.blueReady ? "READY ✓" : "Not Ready";
                 blueBadge.className = gameState.blueReady ? "text-[8px] bg-emerald-600 text-white font-bold px-1 py-0.5 rounded ml-1" : "text-[8px] bg-slate-200 text-slate-700 px-1 py-0.5 rounded ml-1";
+            }
+            if (redPauseBadge) {
+                redPauseBadge.classList.toggle('hidden', !gameState.redPaused);
+            }
+            if (bluePauseBadge) {
+                bluePauseBadge.classList.toggle('hidden', !gameState.bluePaused);
             }
 
             const readyBtn = document.getElementById('readyBtn');
@@ -1076,6 +1125,12 @@
                     readyBtn.innerText = "Ready / Start";
                     readyBtn.className = "bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] sm:text-xs font-bold px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg transition shadow-sm shrink-0";
                 }
+            }
+
+            const pauseBtn = document.getElementById('pauseBtn');
+            if (pauseBtn) {
+                const myPaused = gameState.playerSide === 'red' ? gameState.redPaused : gameState.bluePaused;
+                pauseBtn.innerText = myPaused ? "Resume / Unpause" : "Pause";
             }
         }
 
@@ -1119,6 +1174,14 @@
         function isValidMove(fromRow, fromRect, fromBox, toRow, toRect, piece) {
             const fromOrd = ROW_ORDER_MAP[fromRow];
             const toOrd = ROW_ORDER_MAP[toRow];
+
+            // If the piece is currently sitting in its default placement (centerPiece), 
+            // it can move from either box a or box b (represented by centerPiece start) 
+            // even if it's currently inside the center of the default rectangle.
+            // Once it has moved out into box 'a' or box 'b' of a rectangle, it cannot move under inner boxes of the same rectangle.
+            if (fromRow === toRow && fromRect === toRect && fromBox !== 'center') {
+                return false;
+            }
 
             if (toRow !== 'K' && toRow !== 'A') {
                 const destRect = gameState.board[`${toRow}-${toRect}`];
@@ -1383,41 +1446,86 @@
             const op = rectObj.op;
 
             let result = 0;
-            if (op === '+') result = aVal + bVal;
-            else if (op === '-') result = aVal - bVal;
-            else if (op === '×') result = aVal * bVal;
-            else if (op === '÷') result = bVal === 0 ? (aVal >= 0 ? Infinity : -Infinity) : aVal / bVal;
-
             let resultType = 'neutral';
-            if (isNaN(result) || result === Infinity || result === -Infinity) {
-                if (result === Infinity || result === -Infinity) {
-                    movingPiece.isInf = true;
-                    movingPiece.label = result === Infinity ? '+∞' : '-∞';
-                    rectObj[landingBox === 'a' ? 'aPiece' : 'bPiece'] = movingPiece;
-                    rectObj[oppBox] = null;
-                    return `Infinity yielded! Converted to ${movingPiece.label}.`;
+
+            // Custom mathematical operation rules applied strictly here:
+            if (op === '+') {
+                if ((aVal === Infinity && bVal === -Infinity) || (aVal === -Infinity && bVal === Infinity)) {
+                    result = NaN; // Infinity minus infinity = indeterminate
+                } else {
+                    result = aVal + bVal;
                 }
-                resultType = 'indeterminate';
-            } else if (result > 0) resultType = 'positive';
-            else if (result < 0) resultType = 'negative';
-            else resultType = 'zero';
+            } else if (op === '-') {
+                if ((aVal === Infinity && bVal === Infinity) || (aVal === -Infinity && bVal === -Infinity)) {
+                    result = NaN; // Infinity minus infinity = indeterminate
+                } else {
+                    result = aVal - bVal;
+                }
+            } else if (op === '×') {
+                if ((aVal === 0 && (bVal === Infinity || bVal === -Infinity)) || ((aVal === Infinity || aVal === -Infinity) && bVal === 0)) {
+                    result = NaN; // 0 times infinity = indeterminate
+                } else {
+                    result = aVal * bVal;
+                }
+            } else if (op === '÷') {
+                if (bVal === 0) {
+                    if (aVal === 0) {
+                        result = 0;
+                    } else if (aVal === Infinity || aVal === -Infinity) {
+                        result = aVal; // Infinity / 0 = infinity with same sign
+                    } else {
+                        // Constant / 0 = 0 and no one gets points
+                        rectObj[landingBox === 'a' ? 'aPiece' : 'bPiece'] = null;
+                        rectObj[oppBox] = null;
+                        return `Op: (${aPiece.label} ÷ ${bPiece.label}) = k/0 → Result is 0, both pieces eliminated, no points awarded.`;
+                    }
+                } else if (aVal === 0) {
+                    result = 0; // 0 / infinity or 0 / constant = 0
+                } else if ((aVal === Infinity || aVal === -Infinity) && (bVal === Infinity || bVal === -Infinity)) {
+                    result = NaN; // Infinity over infinity = indeterminate
+                } else if (aVal === Infinity || aVal === -Infinity) {
+                    result = aVal; // Infinity / k = infinity with same sign
+                } else {
+                    result = aVal / bVal;
+                }
+            }
+
+            if (isNaN(result)) {
+                rectObj.aPiece = null;
+                rectObj.bPiece = null;
+                return `Op: (${aPiece.label} ${op} ${bPiece.label}) = Indeterminate → Both pieces eliminated.`;
+            }
+
+            if (result === Infinity || result === -Infinity) {
+                movingPiece.isInf = true;
+                movingPiece.label = result === Infinity ? '+∞' : '-∞';
+                rectObj[landingBox === 'a' ? 'aPiece' : 'bPiece'] = movingPiece;
+                rectObj[oppBox] = null;
+                return `Infinity yielded! Converted to ${movingPiece.label}.`;
+            } else if (result > 0) {
+                resultType = 'positive';
+            } else if (result < 0) {
+                resultType = 'negative';
+            } else {
+                resultType = 'zero';
+            }
 
             if (resultType === 'positive') {
                 gameState.redScore += Math.abs(result);
-                const redPiece = aPiece.color === 'red' ? aPiece : bPiece;
-                rectObj[landingBox === 'a' ? 'aPiece' : 'bPiece'] = redPiece;
+                // Positive score goes to positive side (red), opponent piece is eliminated, but moving piece stays in its place
+                rectObj[landingBox === 'a' ? 'aPiece' : 'bPiece'] = movingPiece;
                 rectObj[oppBox] = null;
             } else if (resultType === 'negative') {
                 gameState.blueScore += Math.abs(result);
-                const bluePiece = aPiece.color === 'blue' ? aPiece : bPiece;
-                rectObj[landingBox === 'a' ? 'aPiece' : 'bPiece'] = bluePiece;
+                // Negative score goes to negative side (blue), opponent piece is eliminated, moving piece stays in place
+                rectObj[landingBox === 'a' ? 'aPiece' : 'bPiece'] = movingPiece;
                 rectObj[oppBox] = null;
             } else {
                 rectObj.aPiece = null;
                 rectObj.bPiece = null;
             }
 
-            return `Op: (${aPiece.label} ${op} ${bPiece.label}) = ${formatVal(result)} → ${resultType === 'positive' ? 'Red Stays' : resultType === 'negative' ? 'Blue Stays' : 'Both Eliminated'}`;
+            return `Op: (${aPiece.label} ${op} ${bPiece.label}) = ${formatVal(result)} → ${resultType === 'positive' ? 'Red Points, Opponent Eliminated' : resultType === 'negative' ? 'Blue Points, Opponent Eliminated' : 'Both Eliminated'}`;
         }
 
         function runBotTurn() {
@@ -1507,15 +1615,7 @@
         document.getElementById('notationBtn').onclick = () => toggleModal('notationModal', true);
 
         document.getElementById('readyBtn').onclick = () => toggleReadyState();
-
-        document.getElementById('pauseBtn').onclick = () => {
-            if (!gameState.gameStarted) return;
-            gameState.gamePaused = !gameState.gamePaused;
-            const pb = document.getElementById('pauseBtn');
-            pb.innerText = gameState.gamePaused ? 'Resume' : 'Pause';
-            showStatus(gameState.gamePaused ? "Match Paused." : "Match Resumed.");
-            if (gameState.gameMode === 'online') syncOnlineState();
-        };
+        document.getElementById('pauseBtn').onclick = () => togglePauseState();
 
         document.getElementById('resetBtn').onclick = () => {
             if (gameState.timerInterval) clearInterval(gameState.timerInterval);
@@ -1523,6 +1623,8 @@
             gameState.gamePaused = false;
             gameState.redReady = false;
             gameState.blueReady = false;
+            gameState.redPaused = false;
+            gameState.bluePaused = false;
             gameState.turn = 'red';
             gameState.redScore = 0;
             gameState.blueScore = 0;
