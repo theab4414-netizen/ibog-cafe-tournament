@@ -777,9 +777,7 @@
                     }
                 }
                 updateTimerDisplay();
-                if (gameState.gameMode === 'online' && gameState.onlineRole === 'host') {
-                    syncOnlineState();
-                }
+                // FIX LAGGING: Don't trigger full network broadcast every second for the clock
             }, 1000);
         }
 
@@ -910,6 +908,7 @@
                     rectEl.style.cssText = `width: 3.2cm; height: 1.8cm; ${bgStyle}`;
                     rectEl.className = `rounded-xl border-2 flex items-center justify-between px-1 py-0.5 relative shadow-sm transition transform shrink-0 ${isSelected ? 'highlight-rect ring-4 ring-amber-400 z-10 scale-[1.02]' : ''}`;
 
+                    // FIX: Allow selecting pieces in box 'a' and box 'b' directly by setting click handlers properly
                     const boxAEl = document.createElement('div');
                     const hasAPiece = rect.aPiece !== null;
                     const isPieceASelected = isSelected && gameState.selectedPiece.fromBox === 'a';
@@ -921,7 +920,16 @@
                     boxAEl.style.height = '1.3cm';
                     boxAEl.className = `rounded-lg flex items-center justify-center font-board ${hasAPiece && (rect.aPiece.isInf || rect.aPiece.label.includes('∞')) ? 'text-xs font-black' : 'text-xs font-bold'} cursor-pointer transition shrink-0 ${boxABg} ${isPieceASelected ? 'ring-2 ring-amber-300 ring-offset-1 scale-105' : ''}`;
                     boxAEl.innerText = hasAPiece ? rect.aPiece.label : 'a';
-                    boxAEl.onclick = (e) => { e.stopPropagation(); handleBoxClick(rowName, c, 'a'); };
+                    
+                    // Box A Click logic
+                    boxAEl.onclick = (e) => { 
+                        e.stopPropagation(); 
+                        if (hasAPiece) {
+                            handlePieceSelect(rowName, c, 'a');
+                        } else {
+                            handleBoxClick(rowName, c, 'a'); 
+                        }
+                    };
 
                     const centerEl = document.createElement('div');
                     centerEl.style.width = '0.98cm';
@@ -942,6 +950,7 @@
                         centerEl.onclick = (e) => { e.stopPropagation(); handleTargetRectClick(rowName, c); };
                     }
 
+                    // Box B Click logic
                     const boxBEl = document.createElement('div');
                     const hasBPiece = rect.bPiece !== null;
                     const isPieceBSelected = isSelected && gameState.selectedPiece.fromBox === 'b';
@@ -953,7 +962,15 @@
                     boxBEl.style.height = '1.3cm';
                     boxBEl.className = `rounded-lg flex items-center justify-center font-board ${hasBPiece && (rect.bPiece.isInf || rect.bPiece.label.includes('∞')) ? 'text-xs font-black' : 'text-xs font-bold'} cursor-pointer transition shrink-0 ${boxBBg} ${isPieceBSelected ? 'ring-2 ring-amber-300 ring-offset-1 scale-105' : ''}`;
                     boxBEl.innerText = hasBPiece ? rect.bPiece.label : 'b';
-                    boxBEl.onclick = (e) => { e.stopPropagation(); handleBoxClick(rowName, c, 'b'); };
+                    
+                    boxBEl.onclick = (e) => { 
+                        e.stopPropagation(); 
+                        if (hasBPiece) {
+                            handlePieceSelect(rowName, c, 'b');
+                        } else {
+                            handleBoxClick(rowName, c, 'b'); 
+                        }
+                    };
 
                     rectEl.appendChild(boxAEl);
                     rectEl.appendChild(centerEl);
