@@ -228,10 +228,22 @@
 
             <!-- Responsive Scaled Board Frame -->
             <div id="boardViewport" class="w-full flex items-center justify-center overflow-x-auto no-scrollbar py-1 relative min-h-[320px] sm:min-h-[420px]">
-                <div id="boardScaler" class="flex flex-col items-center justify-center transition-transform origin-top sm:origin-center my-auto">
+                <div id="boardScaler" class="flex flex-col items-center justify-center transition-transform origin-top sm:origin-center my-auto gap-1">
+                    <!-- Top Infinity Domain & Label Board Panel -->
+                    <div class="w-full flex flex-col sm:flex-row items-center justify-between gap-2 px-1 text-[9px] sm:text-[10px] font-mono text-[var(--text-muted)] bg-[var(--bg-subcard)] p-2 rounded-xl border border-[var(--border-card)]">
+                        <div>k/0 = ±∞; k/∞ = 0; 0/k = 0; 0/∞ = 0; ∞/0 = ±∞</div>
+                        <div>∞ - ∞ = indeterminate; ∞/∞ = indeterminate; 0*(∞) = indeterminate</div>
+                    </div>
+
                     <!-- IBOG Board Container -->
                     <div id="ibogBoard" class="flex flex-col gap-0.5 sm:gap-1 w-max items-center">
                         <!-- Dynamically generated rows K to A -->
+                    </div>
+
+                    <!-- Bottom Infinity Domain & Label Board Panel -->
+                    <div class="w-full flex flex-col sm:flex-row items-center justify-between gap-2 px-1 text-[9px] sm:text-[10px] font-mono text-[var(--text-muted)] bg-[var(--bg-subcard)] p-2 rounded-xl border border-[var(--border-card)]">
+                        <div>k/0 = ±∞; k/∞ = 0; 0/k = 0; 0/∞ = 0; ∞/0 = ±∞</div>
+                        <div>∞ - ∞ = indeterminate; ∞/∞ = indeterminate; 0*(∞) = indeterminate</div>
                     </div>
                 </div>
             </div>
@@ -1085,10 +1097,10 @@
             const turnInd = document.getElementById('turnIndicator');
             if (gameState.turn === 'red') {
                 turnInd.className = "px-3 py-1 rounded-full text-[10px] sm:text-xs font-extrabold bg-rose-700 text-white uppercase tracking-wider shadow-sm text-center truncate";
-                turnInd.innerText = "TURN: DARK ROAST (+)";
+                turnInd.innerText = "TURN: DARK ROAST (+) ";
             } else {
                 turnInd.className = "px-3 py-1 rounded-full text-[10px] sm:text-xs font-extrabold bg-sky-700 text-white uppercase tracking-wider shadow-sm text-center truncate";
-                turnInd.innerText = "TURN: COLD BREW (-)";
+                turnInd.innerText = "TURN: COLD BREW (-) ";
             }
             document.getElementById('moveCount').innerText = `Brewed: ${gameState.logs.length}`;
 
@@ -1175,10 +1187,8 @@
             const fromOrd = ROW_ORDER_MAP[fromRow];
             const toOrd = ROW_ORDER_MAP[toRow];
 
-            // If the piece is currently sitting in its default placement (centerPiece), 
-            // it can move from either box a or box b (represented by centerPiece start) 
-            // even if it's currently inside the center of the default rectangle.
-            // Once it has moved out into box 'a' or box 'b' of a rectangle, it cannot move under inner boxes of the same rectangle.
+            // If piece is currently in box 'a' or box 'b' of the *same* rectangle (fromRow === toRow && fromRect === toRect),
+            // it cannot move to the other box of the same rectangle.
             if (fromRow === toRow && fromRect === toRect && fromBox !== 'center') {
                 return false;
             }
@@ -1448,7 +1458,7 @@
             let result = 0;
             let resultType = 'neutral';
 
-            // Custom mathematical operation rules applied strictly here:
+            // Precise operation rules implemented strictly:
             if (op === '+') {
                 if ((aVal === Infinity && bVal === -Infinity) || (aVal === -Infinity && bVal === Infinity)) {
                     result = NaN; // Infinity minus infinity = indeterminate
@@ -1474,15 +1484,22 @@
                     } else if (aVal === Infinity || aVal === -Infinity) {
                         result = aVal; // Infinity / 0 = infinity with same sign
                     } else {
-                        // Constant / 0 = 0 and no one gets points
-                        rectObj[landingBox === 'a' ? 'aPiece' : 'bPiece'] = null;
-                        rectObj[oppBox] = null;
-                        return `Op: (${aPiece.label} ÷ ${bPiece.label}) = k/0 → Result is 0, both pieces eliminated, no points awarded.`;
+                        // k / 0 = ±∞ based on constant sign or k / infinity = 0
+                        // Wait, user rule: "if a constant number is divided by 0 (k/0) it will become an infinity but the sign of the infinity depends on whose the constant. If it is k/infinity the result will be 0 and no one will get the points or score."
+                        // Let's implement k/0 => infinity with sign of k, and k/infinity => 0 and no points.
+                        result = aVal > 0 ? Infinity : -Infinity;
+                    }
+                } else if (bVal === Infinity || bVal === -Infinity) {
+                    if (aVal === 0 || (!isNaN(aVal) && isFinite(aVal))) {
+                        // k / infinity = 0 and no one gets points
+                        rectObj.aPiece = null;
+                        rectObj.bPiece = null;
+                        return `Op: (${aPiece.label} ÷ ${bPiece.label}) = k/∞ → Result is 0, both pieces eliminated, no points awarded.`;
+                    } else {
+                        result = NaN; // Infinity over infinity = indeterminate
                     }
                 } else if (aVal === 0) {
-                    result = 0; // 0 / infinity or 0 / constant = 0
-                } else if ((aVal === Infinity || aVal === -Infinity) && (bVal === Infinity || bVal === -Infinity)) {
-                    result = NaN; // Infinity over infinity = indeterminate
+                    result = 0; // 0 / k = 0
                 } else if (aVal === Infinity || aVal === -Infinity) {
                     result = aVal; // Infinity / k = infinity with same sign
                 } else {
@@ -1512,12 +1529,12 @@
 
             if (resultType === 'positive') {
                 gameState.redScore += Math.abs(result);
-                // Positive score goes to positive side (red), opponent piece is eliminated, but moving piece stays in its place
+                // Positive score goes to positive side (red), opponent piece eliminated, moving piece stays in place
                 rectObj[landingBox === 'a' ? 'aPiece' : 'bPiece'] = movingPiece;
                 rectObj[oppBox] = null;
             } else if (resultType === 'negative') {
                 gameState.blueScore += Math.abs(result);
-                // Negative score goes to negative side (blue), opponent piece is eliminated, moving piece stays in place
+                // Negative score goes to negative side (blue), opponent piece eliminated, moving piece stays in place
                 rectObj[landingBox === 'a' ? 'aPiece' : 'bPiece'] = movingPiece;
                 rectObj[oppBox] = null;
             } else {
