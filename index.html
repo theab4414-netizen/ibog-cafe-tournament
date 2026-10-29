@@ -785,7 +785,16 @@
                 startTimer();
                 showStatus("Both players ready! Match started. Dark Roast (+) moves first.");
             } else {
-                showStatus(`Waiting for both players to click Ready...`);
+                // Informative message indicating the other player is ready and waiting
+                const mySide = gameState.playerSide;
+                const otherPlayerReady = mySide === 'red' ? gameState.blueReady : gameState.redReady;
+                const otherPlayerName = mySide === 'red' ? "Cold Brew (-)" : "Dark Roast (+)";
+
+                if (otherPlayerReady) {
+                    showStatus(`${otherPlayerName} is "Ready" and waiting for you to click start/ready!`);
+                } else {
+                    showStatus("You are Ready. Waiting for the other player...");
+                }
             }
 
             renderBoard();
