@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full">
+<html lang="en" class="h-full w-full overflow-hidden">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>IBOG CAFÉ TOURNAMENT</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Fredoka:wght@500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
@@ -23,6 +23,10 @@
             --tile-light-border: #9ee0bd;
             --tile-dark-bg: #b6e6ce;
             --tile-dark-border: #62c793;
+            --piece-dark: #006850;
+            --piece-dark-text: #ffffff;
+            --piece-light: #2c856a;
+            --piece-light-text: #ffffff;
         }
 
         body[data-theme="espresso"] {
@@ -39,6 +43,10 @@
             --tile-light-border: #523c33;
             --tile-dark-bg: #3d2a23;
             --tile-dark-border: #694b3e;
+            --piece-dark: #d97706;
+            --piece-dark-text: #ffffff;
+            --piece-light: #b45309;
+            --piece-light-text: #ffffff;
         }
 
         body[data-theme="latte"] {
@@ -55,6 +63,10 @@
             --tile-light-border: #c9b49c;
             --tile-dark-bg: #dfcebc;
             --tile-dark-border: #b89a79;
+            --piece-dark: #8c5319;
+            --piece-dark-text: #ffffff;
+            --piece-light: #a86c2e;
+            --piece-light-text: #ffffff;
         }
 
         body[data-theme="cappuccino"] {
@@ -71,6 +83,10 @@
             --tile-light-border: #475569;
             --tile-dark-bg: #3b4758;
             --tile-dark-border: #64748b;
+            --piece-dark: #c28e5c;
+            --piece-dark-text: #1e242b;
+            --piece-light: #9d6f43;
+            --piece-light-text: #ffffff;
         }
 
         body[data-theme="honeybutter"] {
@@ -87,15 +103,10 @@
             --tile-light-border: #fef08a;
             --tile-dark-bg: #fde047;
             --tile-dark-border: #eab308;
-        }
-
-        html, body {
-            height: 100vh;
-            width: 100vw;
-            overflow: hidden;
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+            --piece-dark: #b45309;
+            --piece-dark-text: #ffffff;
+            --piece-light: #d97706;
+            --piece-light-text: #ffffff;
         }
 
         body {
@@ -106,8 +117,9 @@
             touch-action: manipulation;
             -webkit-user-select: none;
             user-select: none;
-            display: flex;
-            flex-direction: column;
+            overflow: hidden !important;
+            height: 100vh;
+            width: 100vw;
         }
 
         .font-board { font-family: 'Fredoka', sans-serif; }
@@ -140,180 +152,358 @@
             animation: pulse-glow 1.2s infinite;
             border-color: #f59e0b !important;
         }
+
+        ::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-card);
+            border-radius: 4px;
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
     </style>
 </head>
-<body data-theme="matcha">
+<body data-theme="matcha" class="h-screen w-screen flex flex-col overflow-hidden">
 
     <!-- Header / Navbar -->
-    <header class="theme-card border-b px-3 py-1 flex justify-between items-center shadow-sm shrink-0 gap-1">
+    <header class="sticky top-0 z-30 theme-card border-b px-2 py-1.5 sm:px-4 sm:py-2 flex justify-between items-center shadow-md shrink-0 gap-1 h-[48px] sm:h-[54px]">
         <div class="flex items-center gap-1.5 shrink-0">
-            <span class="text-sm">☕</span>
-            <h1 class="text-xs font-black uppercase tracking-wider text-[var(--text-main)]">IBOG CAFÉ</h1>
+            <span class="text-base sm:text-xl">☕</span>
+            <h1 class="text-[11px] sm:text-xs md:text-sm font-black uppercase tracking-wider text-[var(--text-main)] truncate max-w-[100px] sm:max-w-none">IBOG CAFÉ</h1>
         </div>
 
-        <div class="flex items-center gap-1">
-            <button id="readyBtn" class="bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-bold px-2 py-1 rounded transition shadow-sm">Ready / Start</button>
-            <button id="pauseBtn" class="bg-amber-700 hover:bg-amber-800 text-white text-[10px] font-bold px-2 py-1 rounded transition shadow-sm">Pause</button>
-            <button id="configBtn" class="theme-btn-accent text-[10px] font-bold px-2 py-1 rounded transition shadow-sm">Setup</button>
-            <button id="paletteBtn" class="bg-amber-600 hover:bg-amber-700 text-white text-[10px] font-bold px-2 py-1 rounded transition shadow-sm">Themes</button>
-            <button id="onlineBtn" class="bg-purple-700 hover:bg-purple-800 text-white text-[10px] font-bold px-2 py-1 rounded transition shadow-sm">Online</button>
-            <button id="mechanicsBtn" class="theme-subcard hover:opacity-80 text-[10px] font-semibold px-2 py-1 rounded transition border text-[var(--text-main)]">Rules</button>
-            <button id="resetBtn" class="theme-subcard hover:opacity-80 text-[10px] font-semibold px-2 py-1 rounded transition border text-[var(--text-main)]">Reset</button>
+        <!-- Scrollable Mobile Button Action Bar -->
+        <div class="flex items-center gap-1 overflow-x-auto no-scrollbar py-0.5 max-w-[75vw] sm:max-w-none">
+            <button id="readyBtn" class="bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] sm:text-xs font-bold px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg transition shadow-sm shrink-0">Ready / Start</button>
+            <button id="pauseBtn" class="bg-amber-700 hover:bg-amber-800 text-white text-[10px] sm:text-xs font-bold px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg transition shadow-sm shrink-0">Pause</button>
+            <button id="configBtn" class="theme-btn-accent text-[10px] sm:text-xs font-bold px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg transition shadow-sm flex items-center gap-0.5 shrink-0">
+                <span>⚙️</span> <span class="hidden xs:inline">Setup</span>
+            </button>
+            <button id="paletteBtn" class="bg-amber-600 hover:bg-amber-700 text-white text-[10px] sm:text-xs font-bold px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg transition shadow-sm flex items-center gap-0.5 shrink-0">
+                <span>🎨</span> <span class="hidden xs:inline">Themes</span>
+            </button>
+            <button id="onlineBtn" class="bg-purple-700 hover:bg-purple-800 text-white text-[10px] sm:text-xs font-bold px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg transition shadow-sm shrink-0">Online</button>
+            <button id="mechanicsBtn" class="theme-subcard hover:opacity-80 text-[10px] sm:text-xs font-semibold px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg transition border text-[var(--text-main)] shrink-0">Rules</button>
+            <button id="notationBtn" class="theme-subcard hover:opacity-80 text-[10px] sm:text-xs font-semibold px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg transition border text-[var(--text-main)] shrink-0 hidden md:inline-block">Notations</button>
+            <button id="resetBtn" class="theme-subcard hover:opacity-80 text-[10px] sm:text-xs font-semibold px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg transition border text-[var(--text-main)] shrink-0">Reset</button>
         </div>
     </header>
 
-    <!-- Main Container Fitting Screen Without Scrollbars -->
-    <main class="flex-1 flex flex-col lg:flex-row p-2 gap-2 overflow-hidden max-w-[1600px] mx-auto w-full items-center justify-center">
+    <!-- Main Board & Side Controls Container (No Scroll) -->
+    <main class="flex-1 flex flex-col xl:flex-row p-1.5 sm:p-2.5 gap-2 max-w-[1600px] mx-auto w-full items-center justify-between overflow-hidden h-[calc(100vh-54px)]">
 
-        <!-- Board Column -->
-        <div class="flex-1 flex flex-col items-center justify-center theme-card border rounded-xl p-2 shadow-sm w-full h-full overflow-hidden relative">
+        <!-- Left Column: Interactive IBOG Board Section -->
+        <div class="flex-1 flex flex-col items-center justify-between theme-card border rounded-2xl p-1.5 sm:p-2 shadow-sm w-full h-full overflow-hidden relative">
             
-            <div class="grid grid-cols-3 items-center w-full mb-1 px-1 shrink-0">
-                <div class="text-[10px] font-bold text-[var(--text-muted)] flex items-center gap-1">
-                    <span class="w-2 h-2 rounded-full bg-sky-500 inline-block"></span> Cold Brew (-) <span id="blueReadyBadge" class="text-[8px] bg-slate-200 text-slate-700 px-1 py-0.5 rounded">Not Ready</span>
+            <!-- Turn Indicator Bar -->
+            <div class="grid grid-cols-3 items-center w-full px-1 shrink-0 gap-1 h-[28px]">
+                <div class="text-[9px] sm:text-[11px] font-bold text-[var(--text-muted)] flex items-center justify-start gap-1 shrink-0">
+                    <span class="w-2.5 h-2.5 rounded-full bg-sky-500 inline-block"></span> <span class="hidden xs:inline">Cold Brew</span> (-) <span id="blueReadyBadge" class="text-[8px] bg-slate-200 text-slate-700 px-1 py-0.5 rounded ml-1">Not Ready</span> <span id="bluePauseBadge" class="text-[8px] bg-slate-200 text-slate-700 px-1 py-0.5 rounded ml-1 hidden">Paused</span>
                 </div>
                 <div class="flex justify-center items-center">
-                    <div id="turnIndicator" class="px-3 py-0.5 rounded-full text-[10px] font-extrabold theme-btn-accent uppercase tracking-wider text-center">
+                    <div id="turnIndicator" class="px-3 py-0.5 rounded-full text-[10px] sm:text-xs font-extrabold theme-btn-accent uppercase tracking-wider shadow-sm text-center truncate">
                         TURN: DARK ROAST (+)
                     </div>
                 </div>
-                <div class="text-[10px] font-bold text-[var(--text-muted)] flex items-center justify-end gap-1">
-                    <span id="redReadyBadge" class="text-[8px] bg-slate-200 text-slate-700 px-1 py-0.5 rounded">Not Ready</span> Dark Roast (+) <span class="w-2 h-2 rounded-full bg-rose-600 inline-block"></span>
+                <div class="text-[9px] sm:text-[11px] font-bold text-[var(--text-muted)] flex items-center justify-end gap-1 shrink-0">
+                    <span id="redPauseBadge" class="text-[8px] bg-slate-200 text-slate-700 px-1 py-0.5 rounded mr-1 hidden">Paused</span> <span id="redReadyBadge" class="text-[8px] bg-slate-200 text-slate-700 px-1 py-0.5 rounded mr-1">Not Ready</span> <span class="hidden xs:inline">Dark Roast</span> (+) <span class="w-2.5 h-2.5 rounded-full bg-rose-600 inline-block"></span>
                 </div>
             </div>
 
-            <!-- Scaled Board Frame (No scrollbars, fully fitted) -->
-            <div id="boardViewport" class="flex-1 w-full flex items-center justify-center relative overflow-hidden">
+            <!-- Board Scaler Container - Fits Screen Smoothly without scrollbars -->
+            <div id="boardViewport" class="w-full flex-1 flex items-center justify-center overflow-hidden relative my-auto">
                 <div id="boardScaler" class="flex flex-col items-center justify-center transition-transform origin-center gap-1">
                     
-                    <!-- Highly Visible Top Infinity Rules -->
-                    <div class="w-full flex flex-col items-center justify-center gap-0.5 px-2 py-1 text-[11px] font-mono font-bold text-[var(--text-main)] bg-[var(--bg-subcard)] rounded-lg border border-[var(--border-card)] text-center shadow-xs">
+                    <!-- Top Infinity Rules & Formulas Banner -->
+                    <div class="w-full flex flex-col items-center justify-center gap-0.5 px-3 py-1 text-[11px] sm:text-xs font-mono font-bold text-[var(--text-main)] bg-[var(--bg-subcard)] rounded-xl border-2 border-[var(--border-card)] shadow-sm text-center">
                         <div>k/0 = ±∞ | k/∞ = 0 | 0/k = 0 | 0/∞ = 0 | ∞/0 = ±∞</div>
-                        <div class="text-[var(--accent-primary)] text-[10px]">∞ - ∞ = indeterminate | ∞/∞ = indeterminate | 0*(∞) = indeterminate</div>
+                        <div class="text-[var(--accent-primary)] text-[10px] sm:text-[11px]">∞ - ∞ = indeterminate | ∞/∞ = indeterminate | 0*(∞) = indeterminate</div>
                     </div>
 
-                    <!-- IBOG Board Container -->
-                    <div id="ibogBoard" class="flex flex-col gap-0.5 w-max items-center"></div>
+                    <!-- IBOG Board -->
+                    <div id="ibogBoard" class="flex flex-col gap-0.5 w-max items-center py-0.5">
+                        <!-- Dynamically generated rows K to A -->
+                    </div>
 
-                    <!-- Highly Visible Bottom Infinity Rules -->
-                    <div class="w-full flex flex-col items-center justify-center gap-0.5 px-2 py-1 text-[11px] font-mono font-bold text-[var(--text-main)] bg-[var(--bg-subcard)] rounded-lg border border-[var(--border-card)] text-center shadow-xs">
+                    <!-- Bottom Infinity Rules & Formulas Banner -->
+                    <div class="w-full flex flex-col items-center justify-center gap-0.5 px-3 py-1 text-[11px] sm:text-xs font-mono font-bold text-[var(--text-main)] bg-[var(--bg-subcard)] rounded-xl border-2 border-[var(--border-card)] shadow-sm text-center">
                         <div>k/0 = ±∞ | k/∞ = 0 | 0/k = 0 | 0/∞ = 0 | ∞/0 = ±∞</div>
-                        <div class="text-[var(--accent-primary)] text-[10px]">∞ - ∞ = indeterminate | ∞/∞ = indeterminate | 0*(∞) = indeterminate</div>
+                        <div class="text-[var(--accent-primary)] text-[10px] sm:text-[11px]">∞ - ∞ = indeterminate | ∞/∞ = indeterminate | 0*(∞) = indeterminate</div>
                     </div>
 
                 </div>
             </div>
 
-            <div class="flex justify-between items-center w-full mt-1 px-1 shrink-0">
-                <button id="redDrawBtn" class="bg-rose-100 border border-rose-300 text-rose-800 text-[9px] font-bold px-2 py-0.5 rounded">Roast Draw</button>
-                <div id="statusMessage" class="text-[10px] text-center text-[var(--text-muted)] theme-subcard px-2 py-0.5 rounded border max-w-xs font-medium truncate">
-                    Click Ready to start!
+            <!-- Bottom Board Controls & Status Bar -->
+            <div class="flex justify-between items-center w-full px-1 shrink-0 gap-1 h-[32px]">
+                <button id="redDrawBtn" class="bg-rose-100 border border-rose-300 text-rose-800 hover:bg-rose-200 text-[9px] sm:text-[10px] font-bold px-2 py-1 rounded-lg transition shrink-0">Roast Draw</button>
+                <div id="statusMessage" class="text-[10px] sm:text-[11px] text-center text-[var(--text-muted)] theme-subcard px-2 py-0.5 rounded-xl border flex-1 max-w-md font-medium truncate mx-1">
+                    Click Ready to start! Select pieces in center to move into box a or b.
                 </div>
-                <button id="blueDrawBtn" class="bg-sky-100 border border-sky-300 text-sky-800 text-[9px] font-bold px-2 py-0.5 rounded">Cold Draw</button>
+                <button id="blueDrawBtn" class="bg-sky-100 border border-sky-300 text-sky-800 hover:bg-sky-200 text-[9px] sm:text-[10px] font-bold px-2 py-1 rounded-lg transition shrink-0">Cold Draw</button>
             </div>
         </div>
 
-        <!-- Right Column: Clocks & Ledger -->
-        <div class="w-full lg:w-72 flex flex-col gap-2 shrink-0 h-full justify-center">
-            <div class="theme-card border rounded-xl p-2.5 shadow-sm flex flex-col gap-1.5">
-                <h3 class="font-bold text-[11px] uppercase tracking-wider text-[var(--text-main)] border-b border-[var(--border-card)] pb-1 flex justify-between">
-                    <span>CLOCKS & POINTS</span>
+        <!-- Right / Bottom Column: Clocks & Recipe Ledger -->
+        <div class="w-full xl:w-72 flex flex-row xl:flex-col gap-2 shrink-0 h-auto xl:h-full">
+            
+            <!-- Timers and Scores Panel -->
+            <div class="theme-card border rounded-2xl p-2 shadow-sm flex flex-col justify-center gap-1.5 flex-1 xl:flex-none">
+                <h3 class="font-bold text-[11px] uppercase tracking-wider text-[var(--text-main)] border-b border-[var(--border-card)] pb-1 flex items-center justify-between">
+                    <span>CLOCKS & AROMA POINTS</span>
                     <span>⏱️</span>
                 </h3>
-                <div class="grid grid-cols-2 lg:grid-cols-1 gap-1.5">
-                    <div class="theme-subcard border p-1.5 rounded-lg flex justify-between items-center">
+                
+                <div class="grid grid-cols-2 xl:grid-cols-1 gap-1.5">
+                    <!-- Dark Roast (+) Stats -->
+                    <div class="theme-subcard border p-1.5 rounded-xl flex justify-between items-center">
                         <div>
-                            <div class="text-[9px] text-rose-600 font-extrabold uppercase">DARK ROAST (+)</div>
-                            <div class="text-[10px]">Score: <span id="redScore" class="font-black text-rose-600">0</span></div>
+                            <div class="text-[9px] text-rose-600 font-extrabold uppercase tracking-wide">DARK ROAST (+)</div>
+                            <div class="text-[10px] text-[var(--text-main)]">Score: <span id="redScore" class="font-black text-rose-600 text-xs">0</span></div>
                         </div>
                         <div class="text-right">
-                            <div id="redTimer" class="font-mono text-xs font-black">15:00</div>
+                            <div class="text-[8px] text-[var(--text-muted)] font-bold uppercase">TIMER</div>
+                            <div id="redTimer" class="font-mono text-xs sm:text-sm font-black text-[var(--text-main)]">15:00</div>
                         </div>
                     </div>
-                    <div class="theme-subcard border p-1.5 rounded-lg flex justify-between items-center">
+
+                    <!-- Cold Brew (-) Stats -->
+                    <div class="theme-subcard border p-1.5 rounded-xl flex justify-between items-center">
                         <div>
-                            <div class="text-[9px] text-sky-600 font-extrabold uppercase">COLD BREW (-)</div>
-                            <div class="text-[10px]">Score: <span id="blueScore" class="font-black text-sky-600">0</span></div>
+                            <div class="text-[9px] text-sky-600 font-extrabold uppercase tracking-wide">COLD BREW (-)</div>
+                            <div class="text-[10px] text-[var(--text-main)]">Score: <span id="blueScore" class="font-black text-sky-600 text-xs">0</span></div>
                         </div>
                         <div class="text-right">
-                            <div id="blueTimer" class="font-mono text-xs font-black">15:00</div>
+                            <div class="text-[8px] text-[var(--text-muted)] font-bold uppercase">TIMER</div>
+                            <div id="blueTimer" class="font-mono text-xs sm:text-sm font-black text-[var(--text-main)]">15:00</div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="theme-card border rounded-xl p-2.5 shadow-sm flex flex-col flex-1 min-h-[140px] overflow-hidden">
-                <div class="flex justify-between items-center mb-1 pb-1 border-b border-[var(--border-card)]">
-                    <h3 class="font-bold text-[11px] text-[var(--text-main)] uppercase">Recipe Ledger</h3>
-                    <span class="text-[9px] text-[var(--text-muted)]" id="moveCount">Brewed: 0</span>
+            <!-- Score Sheet / Recipe Ledger -->
+            <div class="theme-card border rounded-2xl p-2 shadow-sm flex flex-col flex-1 min-h-[120px] xl:min-h-0 overflow-hidden">
+                <div class="flex justify-between items-center mb-1 pb-1 border-b border-[var(--border-card)] shrink-0">
+                    <h3 class="font-bold text-[11px] text-[var(--text-main)] uppercase tracking-wider flex items-center gap-1">
+                        <span>☕ RECIPE LEDGER</span>
+                    </h3>
+                    <span class="text-[9px] font-bold text-[var(--text-muted)]" id="moveCount">Brewed: 0</span>
                 </div>
-                <div class="flex-1 theme-subcard rounded-lg p-1.5 overflow-y-auto border space-y-1 font-mono text-[10px]" id="notationLog">
-                    <div class="text-[var(--text-muted)] italic text-center py-4">Logs appear here...</div>
+                <div class="flex-1 theme-subcard rounded-xl p-1.5 overflow-y-auto border border-[var(--border-card)] space-y-1 font-mono text-[10px] no-scrollbar" id="notationLog">
+                    <div class="text-[var(--text-muted)] italic text-center py-4 text-[10px]">Brewing logs populate here...</div>
                 </div>
             </div>
+
         </div>
 
     </main>
 
-    <!-- Modals -->
+    <!-- Theme Palette Switcher Modal -->
     <div id="paletteModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-3 hidden">
-        <div class="theme-card border rounded-xl max-w-sm w-full p-4 shadow-xl space-y-2.5">
-            <div class="flex justify-between items-center border-b border-[var(--border-card)] pb-1.5">
-                <h2 class="text-xs font-bold uppercase">Theme Palette</h2>
-                <button onclick="toggleModal('paletteModal', false)" class="font-bold">✕</button>
+        <div class="theme-card border rounded-2xl max-w-md w-full p-4 sm:p-5 shadow-2xl space-y-3 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center border-b border-[var(--border-card)] pb-2">
+                <div class="flex items-center gap-2">
+                    <span class="text-lg">🎨</span>
+                    <h2 class="text-sm sm:text-base font-bold text-[var(--text-main)] uppercase tracking-wide">Café Theme Palette</h2>
+                </div>
+                <button onclick="toggleModal('paletteModal', false)" class="text-[var(--text-muted)] hover:text-[var(--text-main)] font-bold text-lg p-1">✕</button>
             </div>
-            <div class="grid grid-cols-1 gap-1.5 text-xs">
-                <button onclick="setTheme('matcha')" class="p-2 rounded border bg-[#eef7f2] text-left font-bold text-[#0a3d2e]">Matcha Mint Café</button>
-                <button onclick="setTheme('honeybutter')" class="p-2 rounded border bg-[#fffbeb] text-left font-bold text-amber-900">Honey Butter Brew</button>
-                <button onclick="setTheme('espresso')" class="p-2 rounded border bg-[#181210] text-left font-bold text-amber-200">Espresso Dark Roast</button>
-                <button onclick="setTheme('latte')" class="p-2 rounded border bg-[#f7f3ed] text-left font-bold text-[#3d2612]">Latte Macchiato</button>
-                <button onclick="setTheme('cappuccino')" class="p-2 rounded border bg-[#1e242b] text-left font-bold text-slate-100">Cappuccino Dusk</button>
+
+            <div class="grid grid-cols-1 gap-2 text-xs">
+                <button onclick="setTheme('matcha')" class="flex items-center justify-between p-2.5 rounded-xl border border-emerald-300 bg-[#eef7f2] hover:ring-2 hover:ring-emerald-500 transition text-left">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-7 h-7 rounded-lg bg-[#006850] flex items-center justify-center text-white font-bold text-xs">🌿</div>
+                        <div>
+                            <div class="font-bold text-[#0a3d2e]">Matcha Mint Café</div>
+                            <div class="text-[9px] text-[#4b7a67]">Soft mint sage background with emerald tiles</div>
+                        </div>
+                    </div>
+                </button>
+
+                <button onclick="setTheme('honeybutter')" class="flex items-center justify-between p-2.5 rounded-xl border border-amber-300 bg-[#fffbeb] hover:ring-2 hover:ring-amber-500 transition text-left">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-7 h-7 rounded-lg bg-amber-500 flex items-center justify-center text-white font-bold text-xs">🍯</div>
+                        <div>
+                            <div class="font-bold text-amber-900">Honey Butter Brew</div>
+                            <div class="text-[9px] text-amber-700">Warm golden yellow palette with honey accents</div>
+                        </div>
+                    </div>
+                </button>
+
+                <button onclick="setTheme('espresso')" class="flex items-center justify-between p-2.5 rounded-xl border border-amber-900/60 bg-[#181210] hover:ring-2 hover:ring-amber-500 transition text-left">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-7 h-7 rounded-lg bg-[#d97706] flex items-center justify-center text-white font-bold text-xs">☕</div>
+                        <div>
+                            <div class="font-bold text-amber-200">Espresso Dark Roast</div>
+                            <div class="text-[9px] text-amber-400/80">Rich dark coffee roast, warm amber & espresso</div>
+                        </div>
+                    </div>
+                </button>
+
+                <button onclick="setTheme('latte')" class="flex items-center justify-between p-2.5 rounded-xl border border-amber-200 bg-[#f7f3ed] hover:ring-2 hover:ring-amber-700 transition text-left">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-7 h-7 rounded-lg bg-[#8c5319] flex items-center justify-center text-white font-bold text-xs">🥛</div>
+                        <div>
+                            <div class="font-bold text-[#3d2612]">Latte Macchiato</div>
+                            <div class="text-[9px] text-[#785a3c]">Creamy beige background with caramel accents</div>
+                        </div>
+                    </div>
+                </button>
+
+                <button onclick="setTheme('cappuccino')" class="flex items-center justify-between p-2.5 rounded-xl border border-slate-600 bg-[#1e242b] hover:ring-2 hover:ring-amber-400 transition text-left">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-7 h-7 rounded-lg bg-[#c28e5c] flex items-center justify-center text-slate-900 font-bold text-xs">🌙</div>
+                        <div>
+                            <div class="font-bold text-slate-100">Cappuccino Dusk</div>
+                            <div class="text-[9px] text-slate-400">Sleek slate dark UI with hazelnut highlights</div>
+                        </div>
+                    </div>
+                </button>
             </div>
+
+            <button onclick="toggleModal('paletteModal', false)" class="w-full theme-btn-accent text-xs font-bold py-2 rounded-xl transition shadow uppercase tracking-wider">Close</button>
         </div>
     </div>
 
+    <!-- Mechanics Modal -->
     <div id="mechanicsModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-3 hidden">
-        <div class="theme-card border rounded-xl max-w-md w-full p-4 shadow-xl max-h-[80vh] overflow-y-auto text-xs space-y-2">
-            <div class="flex justify-between items-center border-b border-[var(--border-card)] pb-1.5">
-                <h2 class="font-bold uppercase">IBOG Rules & Mechanics</h2>
-                <button onclick="toggleModal('mechanicsModal', false)" class="font-bold">✕</button>
+        <div class="theme-card border rounded-2xl max-w-xl w-full p-4 sm:p-5 shadow-2xl max-h-[85vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-2 border-b border-[var(--border-card)] pb-2">
+                <h2 class="text-sm sm:text-base font-bold text-[var(--text-main)]">IBOG Rules & Café Mechanics</h2>
+                <button onclick="toggleModal('mechanicsModal', false)" class="text-[var(--text-muted)] hover:text-[var(--text-main)] font-bold text-lg p-1">✕</button>
             </div>
-            <p>Pieces start in rows B (Red) and J (Blue). Initial moves can choose either box 'a' or 'b' freely. Division by zero ($k/0$) yields infinity with the constant's sign.</p>
+            <div class="text-[11px] sm:text-xs text-[var(--text-main)] space-y-2.5 leading-relaxed">
+                <p><strong>1. Objective:</strong> Compare rational numbers through binary operations to accumulate positive aroma points (Dark Roast) or negative points (Cold Brew).</p>
+                <p><strong>2. Turns:</strong> Dark Roast (+) pieces move first, followed by Cold Brew (-) pieces in alternating turns.</p>
+                <p><strong>3. First Move (Center Pieces):</strong> Pieces initially in the center can move directly into box 'a' or box 'b' of that <em>same rectangle</em> or into an adjacent rectangle on their first turn.</p>
+                <p><strong>4. Rectangle Color Rule (Boxes a & b):</strong> A single rectangle cannot contain two pieces of the same color across boxes 'a' and 'b'. Once one box is occupied, the other is off-limits to pieces of that same color.</p>
+                <p><strong>5. Infinity Pieces:</strong> Reaching infinity zones (+∞ ROAST DOMAIN or -∞ COLD DOMAIN) or yielding infinity converts a piece to ∞, allowing rook-like unobstructed movement across rows and columns.</p>
+                <p><strong>6. Binary Operations:</strong> When opposing pieces meet in a rectangle (one in 'a', one in 'b'), a binary operation is triggered. Positive results credit Dark Roast, negative credit Cold Brew. Zero or indeterminate results eliminate both pieces.</p>
+                <p><strong>7. Time Control:</strong> Each player is given 15 minutes. Running out of time deducts 25 points.</p>
+            </div>
         </div>
     </div>
 
-    <div id="setupModal" class="fixed inset-0 bg-black/70 backdrop-blur-md z-50 flex items-center justify-center p-3">
-        <div class="theme-card border rounded-xl max-w-xs w-full p-4 shadow-xl space-y-2.5 text-xs">
-            <h2 class="font-bold uppercase border-b pb-1.5">Match Setup</h2>
-            <div class="grid grid-cols-3 gap-1">
-                <button id="mode2P" onclick="setGameMode('2p')" class="py-1.5 px-1 rounded font-bold border theme-btn-accent text-[10px]">2P Mode</button>
-                <button id="modeBot" onclick="setGameMode('bot')" class="py-1.5 px-1 rounded font-bold border theme-subcard text-[10px]">vs Bot</button>
-                <button id="modeOnline" onclick="setGameMode('online')" class="py-1.5 px-1 rounded font-bold border theme-subcard text-[10px]">Online</button>
+    <!-- Notation Guide Modal -->
+    <div id="notationModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-3 hidden">
+        <div class="theme-card border rounded-2xl max-w-xl w-full p-4 sm:p-5 shadow-2xl max-h-[85vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-2 border-b border-[var(--border-card)] pb-2">
+                <h2 class="text-sm sm:text-base font-bold text-[var(--text-main)]">Official Recipe Notation Guide</h2>
+                <button onclick="toggleModal('notationModal', false)" class="text-[var(--text-muted)] hover:text-[var(--text-main)] font-bold text-lg p-1">✕</button>
             </div>
-            <button onclick="applySetupAndClose()" class="w-full theme-btn-accent font-bold py-1.5 rounded uppercase">Start Game</button>
+            <div class="text-[11px] sm:text-xs text-[var(--text-main)] space-y-2 leading-relaxed">
+                <p><strong>Notation Format:</strong> [PieceValue]-[Row][Column][Box]</p>
+                <p><em>Example:</em> <code>-2-E7b</code> indicates piece value -2 moved to row E, column 7, box 'b'.</p>
+                <p><em>Infinity Notation:</em> <code>∞-K</code> or <code>∞-A</code> indicates conversion to infinity domain.</p>
+                <p><em>Operation Symbol:</em> Appended with operation symbol if binary operation occurred (e.g., <code>0.25-F4a÷</code>).</p>
+            </div>
         </div>
     </div>
 
+    <!-- Game Setup Modal -->
+    <div id="setupModal" class="fixed inset-0 bg-black/70 backdrop-blur-md z-50 flex items-center justify-center p-3 hidden">
+        <div class="theme-card border rounded-2xl max-w-sm w-full p-4 sm:p-5 shadow-2xl space-y-3">
+            <div class="border-b border-[var(--border-card)] pb-2">
+                <h2 class="text-sm sm:text-base font-bold text-[var(--text-main)] uppercase tracking-wide">Match Setup</h2>
+                <p class="text-[10px] text-[var(--text-muted)]">Select local match, bot mode, or online play.</p>
+            </div>
+
+            <div class="space-y-3 text-xs">
+                <div>
+                    <label class="block text-[var(--text-main)] font-semibold mb-1">Game Mode</label>
+                    <div class="grid grid-cols-3 gap-1.5">
+                        <button type="button" id="mode2P" onclick="setGameMode('2p')" class="py-2 px-1 rounded-xl font-bold border transition theme-btn-accent text-center text-[10px] sm:text-xs">2P Face-to-Face</button>
+                        <button type="button" id="modeBot" onclick="setGameMode('bot')" class="py-2 px-1 rounded-xl font-bold border transition theme-subcard text-[var(--text-main)] text-center text-[10px] sm:text-xs">1P vs Bot</button>
+                        <button type="button" id="modeOnline" onclick="setGameMode('online')" class="py-2 px-1 rounded-xl font-bold border transition theme-subcard text-[var(--text-main)] text-center text-[10px] sm:text-xs">Play Online</button>
+                    </div>
+                </div>
+
+                <div id="botSettingsGroup" class="space-y-2 pt-2 border-t border-[var(--border-card)] hidden">
+                    <div>
+                        <label class="block text-[var(--text-main)] font-semibold mb-1">Bot Difficulty</label>
+                        <div class="grid grid-cols-3 gap-1.5">
+                            <button type="button" id="diffEasy" onclick="setDifficulty('easy')" class="py-1 px-1 rounded-lg font-bold border text-[10px] theme-subcard">Easy</button>
+                            <button type="button" id="diffMed" onclick="setDifficulty('medium')" class="py-1 px-1 rounded-lg font-bold border text-[10px] theme-btn-accent">Medium</button>
+                            <button type="button" id="diffHard" onclick="setDifficulty('hard')" class="py-1 px-1 rounded-lg font-bold border text-[10px] theme-subcard">Hard</button>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-[var(--text-main)] font-semibold mb-1">Your Side</label>
+                        <div class="grid grid-cols-2 gap-1.5">
+                            <button type="button" id="sideRed" onclick="setPlayerSide('red')" class="py-1.5 px-2 rounded-xl font-bold border transition bg-rose-700 text-white shadow text-[10px]">Dark Roast (+)</button>
+                            <button type="button" id="sideBlue" onclick="setPlayerSide('blue')" class="py-1.5 px-2 rounded-xl font-bold border transition theme-subcard text-[var(--text-main)] text-[10px]">Cold Brew (-)</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button onclick="applySetupAndClose()" class="w-full theme-btn-accent font-bold py-2 rounded-xl transition shadow text-xs uppercase tracking-wider">Confirm Setup & Play</button>
+        </div>
+    </div>
+
+    <!-- Online Multiplayer Modal -->
     <div id="onlineModal" class="fixed inset-0 bg-black/70 backdrop-blur-md z-50 flex items-center justify-center p-3 hidden">
-        <div class="theme-card border rounded-xl max-w-xs w-full p-4 shadow-xl space-y-2.5 text-xs">
-            <div class="flex justify-between items-center border-b pb-1.5">
-                <h2 class="font-bold uppercase">Online Room</h2>
-                <button onclick="toggleModal('onlineModal', false)" class="font-bold">✕</button>
+        <div class="theme-card border rounded-2xl max-w-sm w-full p-4 sm:p-5 shadow-2xl space-y-3 text-xs">
+            <div class="flex justify-between items-center border-b border-[var(--border-card)] pb-2">
+                <h2 class="text-sm sm:text-base font-bold text-[var(--text-main)] uppercase tracking-wide">Online Café Match</h2>
+                <button onclick="toggleModal('onlineModal', false)" class="text-[var(--text-muted)] font-bold text-lg p-1">✕</button>
             </div>
-            <button onclick="createOnlineRoom()" class="w-full bg-purple-700 text-white font-bold py-1.5 rounded">Create Room</button>
-            <div class="flex gap-1">
-                <input type="text" id="roomIdInput" placeholder="Room ID..." class="flex-1 theme-subcard border rounded px-2 py-1">
-                <button onclick="joinOnlineRoom()" class="theme-btn-accent font-bold px-3 py-1 rounded">Join</button>
+            <p class="text-[var(--text-muted)] text-[11px]">Create a room ID or join an existing game room.</p>
+
+            <div class="space-y-2.5 pt-1">
+                <button onclick="createOnlineRoom()" class="w-full bg-purple-700 hover:bg-purple-800 text-white font-bold py-2 rounded-xl transition shadow text-xs uppercase tracking-wider">Create New Room</button>
+
+                <div class="relative flex py-0.5 items-center">
+                    <div class="flex-grow border-t border-[var(--border-card)]"></div>
+                    <span class="flex-shrink mx-2 text-[var(--text-muted)] font-bold uppercase text-[9px]">or join room</span>
+                    <div class="flex-grow border-t border-[var(--border-card)]"></div>
+                </div>
+
+                <div class="flex gap-1.5">
+                    <input type="text" id="roomIdInput" placeholder="Enter Room ID..." class="flex-1 theme-subcard border rounded-xl px-2.5 py-1.5 text-[var(--text-main)] focus:outline-none text-xs">
+                    <button onclick="joinOnlineRoom()" class="theme-btn-accent font-bold px-3 py-1.5 rounded-xl transition shadow text-xs">Join</button>
+                </div>
+
+                <div id="roomInfoContainer" class="theme-subcard p-2.5 rounded-xl border hidden space-y-1.5">
+                    <div class="text-[var(--text-muted)] font-semibold text-[10px]">Active Room ID:</div>
+                    <div class="flex items-center justify-between theme-card p-1.5 rounded-lg border font-mono font-bold text-[var(--accent-primary)] text-xs">
+                        <span id="displayRoomId">---</span>
+                        <button onclick="copyRoomId()" class="theme-subcard hover:opacity-80 px-2 py-0.5 rounded text-[9px] text-[var(--text-main)]">Copy ID</button>
+                    </div>
+                    <div class="text-[10px] text-emerald-600 font-medium" id="roomStatusText">Waiting for opponent to join...</div>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Script Logic -->
+    <!-- Supabase Client Setup -->
     <script>
         const SUPABASE_URL = "https://qhrhcamtjkmgfsglttsp.supabase.co";
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFocmhjYW10amttZ2ZzZ2x0dHNwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMyNzAzNDUsImV4cCI6MjEwODg0NjM0NX0.FyMHqRUg8j0JYf71AGXAzURFrpylXPK9UAfWorz8DLU";
-        let supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
+        let supabaseClient = null;
+        let isSupabaseInitialized = false;
+
+        try {
+            supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            isSupabaseInitialized = true;
+        } catch (e) {
+            console.warn("Supabase initialization error:", e);
+        }
+
+        window.sb = { client: supabaseClient, isInitialized: isSupabaseInitialized };
+    </script>
+
+    <!-- JavaScript Application Logic -->
+    <script>
         const ROW_NAMES = ['K', 'J', 'I', 'H', 'G', 'F', 'E', 'D', 'C', 'B', 'A'];
         const ROW_ORDER_MAP = { 'K': 10, 'J': 9, 'I': 8, 'H': 7, 'G': 6, 'F': 5, 'E': 4, 'D': 3, 'C': 2, 'B': 1, 'A': 0 };
 
@@ -339,11 +529,15 @@
             blueTime: 15 * 60,
             redReady: false,
             blueReady: false,
+            redPaused: false,
+            bluePaused: false,
             timerInterval: null,
             selectedPiece: null,
+            moveNumber: 1,
             logs: [],
             board: {},
             gameMode: '2p',
+            botDifficulty: 'medium',
             playerSide: 'red',
             onlineRoomId: null,
             onlineRole: null,
@@ -352,20 +546,57 @@
 
         function setTheme(themeName) {
             document.body.setAttribute('data-theme', themeName);
+            showStatus(`Theme switched to ${themeName.toUpperCase()}`);
             renderBoard();
         }
 
         function setGameMode(mode) {
             gameState.gameMode = mode;
-            ['2P', 'Bot', 'Online'].forEach(m => {
-                const btn = document.getElementById(`mode${m}`);
-                if (btn) btn.className = "py-1.5 px-1 rounded font-bold border theme-subcard text-[10px]";
+            const btn2p = document.getElementById('mode2P');
+            const btnBot = document.getElementById('modeBot');
+            const btnOnline = document.getElementById('modeOnline');
+            const botGroup = document.getElementById('botSettingsGroup');
+
+            [btn2p, btnBot, btnOnline].forEach(b => {
+                if (b) b.className = "py-2 px-1 rounded-xl font-bold border transition theme-subcard text-[var(--text-main)] text-center text-[10px] sm:text-xs";
             });
-            const activeBtn = document.getElementById(`mode${mode === '2p' ? '2P' : mode === 'bot' ? 'Bot' : 'Online'}`);
-            if (activeBtn) activeBtn.className = "py-1.5 px-1 rounded font-bold border theme-btn-accent text-[10px]";
-            if (mode === 'online') {
+
+            if (mode === '2p') {
+                btn2p.className = "py-2 px-1 rounded-xl font-bold border transition theme-btn-accent text-center text-[10px] sm:text-xs";
+                botGroup.classList.add('hidden');
+            } else if (mode === 'bot') {
+                btnBot.className = "py-2 px-1 rounded-xl font-bold border transition theme-btn-accent text-center text-[10px] sm:text-xs";
+                botGroup.classList.remove('hidden');
+            } else if (mode === 'online') {
+                btnOnline.className = "py-2 px-1 rounded-xl font-bold border transition theme-btn-accent text-center text-[10px] sm:text-xs";
+                botGroup.classList.add('hidden');
                 toggleModal('setupModal', false);
                 toggleModal('onlineModal', true);
+            }
+        }
+
+        function setDifficulty(diff) {
+            gameState.botDifficulty = diff;
+            ['easy', 'medium', 'hard'].forEach(d => {
+                const b = document.getElementById(`diff${d.charAt(0).toUpperCase() + d.slice(1)}`);
+                if (b) {
+                    b.className = d === diff 
+                        ? "py-1 px-1 rounded-lg font-bold border text-[10px] theme-btn-accent" 
+                        : "py-1 px-1 rounded-lg font-bold border text-[10px] theme-subcard";
+                }
+            });
+        }
+
+        function setPlayerSide(side) {
+            gameState.playerSide = side;
+            const btnRed = document.getElementById('sideRed');
+            const btnBlue = document.getElementById('sideBlue');
+            if (side === 'red') {
+                btnRed.className = "py-1.5 px-2 rounded-xl font-bold border transition bg-rose-700 text-white shadow text-[10px]";
+                btnBlue.className = "py-1.5 px-2 rounded-xl font-bold border transition theme-subcard text-[var(--text-main)] text-[10px]";
+            } else {
+                btnBlue.className = "py-1.5 px-2 rounded-xl font-bold border transition bg-sky-700 text-white shadow text-[10px]";
+                btnRed.className = "py-1.5 px-2 rounded-xl font-bold border transition theme-subcard text-[var(--text-main)] text-[10px]";
             }
         }
 
@@ -373,67 +604,159 @@
             toggleModal('setupModal', false);
             initBoard();
             renderBoard();
-            showStatus("Setup ready! Click Ready to begin.");
+            if (gameState.gameMode === 'online') {
+                toggleModal('onlineModal', true);
+            } else {
+                showStatus(gameState.gameMode === '2p' ? "2P Face-to-Face ready! Click Ready to begin." : "Barista Bot ready! Click Ready to start.");
+            }
         }
 
         async function createOnlineRoom() {
-            if (!supabaseClient) return;
+            if (!window.sb || !window.sb.isInitialized) {
+                showStatus("Online multiplayer requires Supabase connection.");
+                return;
+            }
             const roomId = Math.random().toString(36).substring(2, 8).toUpperCase();
             gameState.onlineRoomId = roomId;
             gameState.onlineRole = 'host';
             gameState.playerSide = 'red';
             gameState.gameMode = 'online';
+
             initBoard();
-            toggleModal('onlineModal', false);
+
+            document.getElementById('roomInfoContainer').classList.remove('hidden');
+            document.getElementById('displayRoomId').innerText = roomId;
+            document.getElementById('roomStatusText').innerText = "Waiting for guest...";
+            
             subscribeToOnlineRoom(roomId);
-            showStatus(`Room Created! ID: ${roomId}`);
+            showStatus(`Online Room created! ID: ${roomId}`);
         }
 
         async function joinOnlineRoom() {
             const roomId = document.getElementById('roomIdInput').value.trim().toUpperCase();
-            if (!roomId || !supabaseClient) return;
+            if (!roomId || !window.sb || !window.sb.isInitialized) return;
+
             gameState.onlineRoomId = roomId;
             gameState.onlineRole = 'guest';
             gameState.playerSide = 'blue';
             gameState.gameMode = 'online';
+
+            document.getElementById('roomInfoContainer').classList.remove('hidden');
+            document.getElementById('displayRoomId').innerText = roomId;
+            document.getElementById('roomStatusText').innerText = "Connecting to room as Cold Brew...";
             toggleModal('onlineModal', false);
+
             subscribeToOnlineRoom(roomId);
             showStatus("Joined online room!");
         }
 
-        function subscribeToOnlineRoom(roomId) {
-            if (!supabaseClient) return;
-            gameState.supabaseChannel = supabaseClient.channel(`room_${roomId}`, { config: { broadcast: { self: false } } });
-            gameState.supabaseChannel.on('broadcast', { event: 'state_update' }, ({ payload }) => {
-                if (!payload) return;
-                gameState.turn = payload.turn;
-                gameState.redScore = payload.redScore;
-                gameState.blueScore = payload.blueScore;
-                gameState.redReady = payload.redReady;
-                gameState.blueReady = payload.blueReady;
-                gameState.gameStarted = payload.gameStarted;
-                gameState.logs = payload.logs || [];
-                deserializeBoard(payload.board);
-                renderBoard();
-            }).subscribe();
+        function copyRoomId() {
+            const idText = document.getElementById('displayRoomId').innerText;
+            if (navigator.clipboard) navigator.clipboard.writeText(idText);
+            showStatus("Room ID copied!");
         }
 
-        function syncOnlineState() {
-            if (gameState.gameMode !== 'online' || !gameState.supabaseChannel) return;
-            gameState.supabaseChannel.send({
-                type: 'broadcast',
-                event: 'state_update',
-                payload: {
-                    board: serializeBoard(),
-                    turn: gameState.turn,
-                    redScore: gameState.redScore,
-                    blueScore: gameState.blueScore,
-                    redReady: gameState.redReady,
-                    blueReady: gameState.blueReady,
-                    gameStarted: gameState.gameStarted,
-                    logs: gameState.logs
+        function subscribeToOnlineRoom(roomId) {
+            if (gameState.supabaseChannel) {
+                try {
+                    window.sb.client.removeChannel(gameState.supabaseChannel);
+                } catch (e) {
+                    console.warn("Could not remove channel:", e);
                 }
-            });
+            }
+
+            try {
+                gameState.supabaseChannel = window.sb.client.channel(`room_${roomId}`, {
+                    config: {
+                        broadcast: { self: false }
+                    }
+                });
+
+                gameState.supabaseChannel
+                    .on('broadcast', { event: 'state_update' }, ({ payload }) => {
+                        if (!payload) return;
+                        gameState.turn = payload.turn;
+                        gameState.redScore = payload.redScore;
+                        gameState.blueScore = payload.blueScore;
+                        gameState.redTime = payload.redTime;
+                        gameState.blueTime = payload.blueTime;
+                        gameState.redReady = payload.redReady;
+                        gameState.blueReady = payload.blueReady;
+                        gameState.redPaused = payload.redPaused;
+                        gameState.bluePaused = payload.bluePaused;
+                        gameState.gameStarted = payload.gameStarted;
+                        gameState.gamePaused = payload.gamePaused;
+                        gameState.logs = payload.logs || [];
+
+                        deserializeBoard(payload.board);
+                        renderBoard();
+
+                        if (gameState.gameStarted && !gameState.timerInterval) {
+                            startTimer();
+                        }
+
+                        if (payload.guestJoined && gameState.onlineRole === 'host') {
+                            document.getElementById('roomStatusText').innerText = "Guest connected! Both players click Ready.";
+                        }
+                    })
+                    .on('broadcast', { event: 'guest_join' }, () => {
+                        if (gameState.onlineRole === 'host') {
+                            document.getElementById('roomStatusText').innerText = "Guest connected! Both players click Ready.";
+                            syncOnlineState(true);
+                        }
+                    })
+                    .subscribe((status, err) => {
+                        if (err || status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+                            showStatus("Online WebSockets blocked in preview environment. Switch to 2P or Bot mode.");
+                            if (document.getElementById('roomStatusText')) {
+                                document.getElementById('roomStatusText').innerText = "WebSocket restricted in preview container. Use 2P/Bot mode.";
+                            }
+                        } else if (status === 'SUBSCRIBED') {
+                            if (gameState.onlineRole === 'guest') {
+                                gameState.supabaseChannel.send({
+                                    type: 'broadcast',
+                                    event: 'guest_join',
+                                    payload: {}
+                                }).catch(() => {});
+                                document.getElementById('roomStatusText').innerText = "Connected to room as Cold Brew!";
+                            }
+                        }
+                    });
+            } catch (err) {
+                console.warn("WebSocket initialization blocked:", err);
+                showStatus("Online sockets restricted in preview mode. Play 2P or Bot mode.");
+                if (document.getElementById('roomStatusText')) {
+                    document.getElementById('roomStatusText').innerText = "WebSocket restricted in preview container. Use 2P/Bot mode.";
+                }
+            }
+        }
+
+        async function syncOnlineState(guestJoined = false) {
+            if (gameState.gameMode !== 'online' || !gameState.onlineRoomId || !gameState.supabaseChannel) return;
+            try {
+                await gameState.supabaseChannel.send({
+                    type: 'broadcast',
+                    event: 'state_update',
+                    payload: {
+                        board: serializeBoard(),
+                        turn: gameState.turn,
+                        redScore: gameState.redScore,
+                        blueScore: gameState.blueScore,
+                        redTime: gameState.redTime,
+                        blueTime: gameState.blueTime,
+                        redReady: gameState.redReady,
+                        blueReady: gameState.blueReady,
+                        redPaused: gameState.redPaused,
+                        bluePaused: gameState.bluePaused,
+                        gameStarted: gameState.gameStarted,
+                        gamePaused: gameState.gamePaused,
+                        logs: gameState.logs,
+                        guestJoined: guestJoined
+                    }
+                });
+            } catch (e) {
+                console.debug("Supabase Broadcast Error:", e);
+            }
         }
 
         function serializeBoard() {
@@ -441,6 +764,10 @@
             for (let k in gameState.board) {
                 const rect = gameState.board[k];
                 serialized[k] = {
+                    rowName: rect.rowName,
+                    rectIdx: rect.rectIdx,
+                    op: rect.op,
+                    isGreen: rect.isGreen,
                     centerPiece: rect.centerPiece ? { ...rect.centerPiece } : null,
                     aPiece: rect.aPiece ? { ...rect.aPiece } : null,
                     bPiece: rect.bPiece ? { ...rect.bPiece } : null
@@ -451,20 +778,30 @@
 
         function deserializeBoard(serialized) {
             if (!serialized) return;
+            gameState.board = {};
             for (let k in serialized) {
-                if (gameState.board[k]) {
-                    gameState.board[k].centerPiece = serialized[k].centerPiece;
-                    gameState.board[k].aPiece = serialized[k].aPiece;
-                    gameState.board[k].bPiece = serialized[k].bPiece;
-                }
+                const rect = serialized[k];
+                gameState.board[k] = {
+                    rowName: rect.rowName,
+                    rectIdx: rect.rectIdx,
+                    op: rect.op,
+                    isGreen: rect.isGreen,
+                    centerPiece: rect.centerPiece ? { ...rect.centerPiece } : null,
+                    aPiece: rect.aPiece ? { ...rect.aPiece } : null,
+                    bPiece: rect.bPiece ? { ...rect.bPiece } : null
+                };
             }
         }
 
         function toggleReadyState() {
             if (gameState.gameStarted) return;
+
             if (gameState.gameMode === 'online') {
-                if (gameState.playerSide === 'red') gameState.redReady = !gameState.redReady;
-                else gameState.blueReady = !gameState.blueReady;
+                if (gameState.playerSide === 'red') {
+                    gameState.redReady = !gameState.redReady;
+                } else {
+                    gameState.blueReady = !gameState.blueReady;
+                }
             } else {
                 gameState.redReady = true;
                 gameState.blueReady = true;
@@ -472,29 +809,106 @@
 
             if (gameState.redReady && gameState.blueReady) {
                 gameState.gameStarted = true;
+                gameState.gamePaused = false;
+                gameState.redPaused = false;
+                gameState.bluePaused = false;
                 startTimer();
-                showStatus("Match started! Dark Roast (+) moves first.");
+                showStatus("Both players ready! Match started. Dark Roast (+) moves first.");
             } else {
-                showStatus("Waiting for other player to be Ready...");
+                const mySide = gameState.playerSide;
+                const otherPlayerReady = mySide === 'red' ? gameState.blueReady : gameState.redReady;
+                const otherPlayerName = mySide === 'red' ? "Cold Brew (-)" : "Dark Roast (+)";
+
+                if (otherPlayerReady) {
+                    showStatus(`${otherPlayerName} is "Ready" and waiting for you to click start/ready!`);
+                } else {
+                    showStatus("You are Ready. Waiting for the other player...");
+                }
             }
+
             renderBoard();
-            syncOnlineState();
+            if (gameState.gameMode === 'online') syncOnlineState();
+        }
+
+        function togglePauseState() {
+            if (!gameState.gameStarted) return;
+
+            if (gameState.gameMode === 'online') {
+                if (gameState.playerSide === 'red') {
+                    gameState.redPaused = !gameState.redPaused;
+                } else {
+                    gameState.bluePaused = !gameState.bluePaused;
+                }
+
+                if (gameState.redPaused && gameState.bluePaused) {
+                    gameState.gamePaused = true;
+                    showStatus("Match is Paused by both players.");
+                } else if (!gameState.redPaused && !gameState.bluePaused) {
+                    gameState.gamePaused = false;
+                    showStatus("Match resumed by both players.");
+                } else {
+                    const mySide = gameState.playerSide;
+                    const otherPaused = mySide === 'red' ? gameState.bluePaused : gameState.redPaused;
+                    const otherName = mySide === 'red' ? "Cold Brew (-)" : "Dark Roast (+)";
+                    if (otherPaused) {
+                        showStatus(`${otherName} wants to Pause. Click Pause to confirm.`);
+                    } else {
+                        showStatus("You requested a Pause. Waiting for other player to click Pause.");
+                    }
+                }
+            } else {
+                gameState.gamePaused = !gameState.gamePaused;
+                showStatus(gameState.gamePaused ? "Match Paused." : "Match Resumed.");
+            }
+
+            renderBoard();
+            if (gameState.gameMode === 'online') syncOnlineState();
         }
 
         function startTimer() {
             if (gameState.timerInterval) clearInterval(gameState.timerInterval);
             gameState.timerInterval = setInterval(() => {
                 if (!gameState.gameStarted || gameState.gamePaused) return;
-                if (gameState.turn === 'red') gameState.redTime--;
-                else gameState.blueTime--;
+                if (gameState.turn === 'red') {
+                    gameState.redTime--;
+                    if (gameState.redTime <= 0) {
+                        gameState.redTime = 0;
+                        clearInterval(gameState.timerInterval);
+                        handleTimeOut('red');
+                    }
+                } else {
+                    gameState.blueTime--;
+                    if (gameState.blueTime <= 0) {
+                        gameState.blueTime = 0;
+                        clearInterval(gameState.timerInterval);
+                        handleTimeOut('blue');
+                    }
+                }
                 updateTimerDisplay();
             }, 1000);
         }
 
         function updateTimerDisplay() {
-            const fmt = (sec) => `${Math.floor(sec / 60).toString().padStart(2, '0')}:${(sec % 60).toString().padStart(2, '0')}`;
+            const fmt = (sec) => {
+                const m = Math.floor(sec / 60);
+                const s = sec % 60;
+                return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+            };
             document.getElementById('redTimer').innerText = fmt(gameState.redTime);
             document.getElementById('blueTimer').innerText = fmt(gameState.blueTime);
+        }
+
+        function handleTimeOut(color) {
+            if (color === 'red') {
+                gameState.redScore -= 25;
+                gameState.blueScore += 25;
+                showStatus("Dark Roast ran out of time! (-25 pts)");
+            } else {
+                gameState.blueScore -= 25;
+                gameState.redScore += 25;
+                showStatus("Cold Brew ran out of time! (-25 pts)");
+            }
+            updateUI();
         }
 
         function parseVal(str) {
@@ -531,30 +945,32 @@
             });
             gameState.board['A-0'] = { rowName: 'A', rectIdx: 0, op: '-∞ COLD DOMAIN', centerPiece: null, aPiece: null, bPiece: null, isGreen: false };
 
-            // Blue pieces (Row J, I, H)
             gameState.board['J-0'].centerPiece = { color: 'blue', val: '5', label: '5', isInf: false };
             gameState.board['J-1'].centerPiece = { color: 'blue', val: '0', label: '0', isInf: false };
             gameState.board['J-2'].centerPiece = { color: 'blue', val: '-5', label: '-5', isInf: false };
+
             gameState.board['I-0'].centerPiece = { color: 'blue', val: '3', label: '3', isInf: false };
             gameState.board['I-1'].centerPiece = { color: 'blue', val: '4', label: '4', isInf: false };
             gameState.board['I-2'].centerPiece = { color: 'blue', val: '-0.25', label: '-0.25', isInf: false };
             gameState.board['I-3'].centerPiece = { color: 'blue', val: '-4', label: '-4', isInf: false };
             gameState.board['I-4'].centerPiece = { color: 'blue', val: '-3', label: '-3', isInf: false };
-            ['2', '1', '1/2', '0.25', '-1/2', '-1', '-2'].forEach((v, idx) => {
+
+            const blueVals = ['2', '1', '1/2', '0.25', '-1/2', '-1', '-2'];
+            blueVals.forEach((v, idx) => {
                 gameState.board[`H-${idx}`].centerPiece = { color: 'blue', val: v, label: v, isInf: false };
             });
 
-            // Red pieces (Row D, C, B)
-            ['2', '1', '1/2', '0.25', '-1/2', '-1', '-2'].forEach((v, idx) => {
+            const redVals = ['2', '1', '1/2', '0.25', '-1/2', '-1', '-2'];
+            redVals.forEach((v, idx) => {
                 gameState.board[`D-${idx}`].centerPiece = { color: 'red', val: v, label: v, isInf: false };
             });
+
             gameState.board['C-0'].centerPiece = { color: 'red', val: '3', label: '3', isInf: false };
             gameState.board['C-1'].centerPiece = { color: 'red', val: '4', label: '4', isInf: false };
             gameState.board['C-2'].centerPiece = { color: 'red', val: '-0.25', label: '-0.25', isInf: false };
             gameState.board['C-3'].centerPiece = { color: 'red', val: '-4', label: '-4', isInf: false };
             gameState.board['C-4'].centerPiece = { color: 'red', val: '-3', label: '-3', isInf: false };
-            
-            // Row B (10th row from top) - Red 5 at rect 0
+
             gameState.board['B-0'].centerPiece = { color: 'red', val: '5', label: '5', isInf: false };
             gameState.board['B-1'].centerPiece = { color: 'red', val: '0', label: '0', isInf: false };
             gameState.board['B-2'].centerPiece = { color: 'red', val: '-5', label: '-5', isInf: false };
@@ -564,214 +980,496 @@
             const container = document.getElementById('ibogBoard');
             container.innerHTML = '';
 
-            const renderRow = (rowName, ops, isDomain = false, domainTitle = '') => {
+            // Top infinity zone (Roast Domain)
+            const rK = document.createElement('div');
+            rK.className = "flex justify-center w-full";
+            const kPiece = gameState.board['K-0'].centerPiece;
+            rK.innerHTML = `
+                <div class="theme-btn-accent border-2 border-[var(--border-card)] font-black px-1 py-0.5 rounded-xl text-center shadow-md cursor-pointer transition text-xs tracking-wider flex items-center justify-center gap-1.5 shrink-0" style="width: 3.0cm; height: 1.4cm;" onclick="handleInfZoneClick('K')">
+                    <span class="font-black text-[10px] leading-tight flex-1 text-center">+∞ ROAST DOMAIN</span>
+                    ${kPiece ? `<span class="bg-white text-rose-700 font-board px-1.5 py-0.5 rounded-lg text-xs font-black shadow cursor-pointer border border-rose-300 shrink-0" onclick="event.stopPropagation(); handlePieceSelect('K', 0, 'center')">${kPiece.label}</span>` : ''}
+                </div>
+            `;
+            container.appendChild(rK);
+
+            const middleRows = ['J', 'I', 'H', 'G', 'F', 'E', 'D', 'C', 'B'];
+            middleRows.forEach(rowName => {
                 const rowDiv = document.createElement('div');
                 rowDiv.className = "flex justify-center gap-1 items-center w-full";
+                const ops = OPERATIONS_CONFIG[rowName];
+                if (!ops) return;
 
-                if (isDomain) {
-                    const piece = gameState.board[`${rowName}-0`].centerPiece;
-                    rowDiv.innerHTML = `
-                        <div class="theme-btn-accent border-2 border-[var(--border-card)] font-black px-2 py-1 rounded-lg text-center shadow cursor-pointer text-xs flex items-center justify-center gap-2" style="width: 260px; height: 36px;" onclick="handleInfZoneClick('${rowName}')">
-                            <span>${domainTitle}</span>
-                            ${piece ? `<span class="bg-white text-rose-700 px-1.5 py-0.5 rounded text-xs font-bold shadow" onclick="event.stopPropagation(); handlePieceSelect('${rowName}', 0, 'center')">${piece.label}</span>` : ''}
-                        </div>
-                    `;
-                } else {
-                    ops.forEach((opObj, c) => {
-                        const key = `${rowName}-${c}`;
-                        const rect = gameState.board[key];
-                        if (!rect) return;
+                ops.forEach((opObj, c) => {
+                    const key = `${rowName}-${c}`;
+                    const rect = gameState.board[key];
+                    if (!rect) return;
 
-                        const isSelected = gameState.selectedPiece && gameState.selectedPiece.rowName === rowName && gameState.selectedPiece.rectIdx === c;
-                        const rectEl = document.createElement('div');
-                        
-                        let bgStyle = rect.isGreen ? 'background-color: var(--tile-dark-bg); border-color: var(--tile-dark-border);' : 'background-color: var(--tile-light-bg); border-color: var(--tile-light-border);';
-                        rectEl.style.cssText = `width: 105px; height: 38px; ${bgStyle}`;
-                        rectEl.className = `rounded-lg border-2 flex items-center justify-between px-1 relative shadow-xs transition ${isSelected ? 'highlight-rect ring-2 ring-amber-400 z-10' : ''}`;
+                    const isGreen = rect.isGreen;
+                    const isSelected = gameState.selectedPiece && gameState.selectedPiece.rowName === rowName && gameState.selectedPiece.rectIdx === c;
 
-                        // Box A
-                        const boxAEl = document.createElement('div');
-                        const hasAP = rect.aPiece !== null;
-                        boxAEl.style.cssText = "width: 30px; height: 30px;";
-                        boxAEl.className = `rounded flex items-center justify-center font-board text-[10px] font-bold cursor-pointer transition ${hasAP ? (rect.aPiece.color === 'red' ? 'bg-rose-600 text-white shadow' : 'bg-sky-600 text-white shadow') : 'bg-white/50 text-[var(--text-main)] border border-[var(--border-card)]'}`;
-                        boxAEl.innerText = hasAP ? rect.aPiece.label : 'a';
-                        boxAEl.onclick = (e) => { e.stopPropagation(); hasAP ? handlePieceSelect(rowName, c, 'a') : handleBoxClick(rowName, c, 'a'); };
+                    const rectEl = document.createElement('div');
+                    
+                    let bgStyle = isGreen 
+                        ? 'background-color: var(--tile-dark-bg); border-color: var(--tile-dark-border);' 
+                        : 'background-color: var(--tile-light-bg); border-color: var(--tile-light-border);';
+                    
+                    rectEl.style.cssText = `width: 3.0cm; height: 1.4cm; ${bgStyle}`;
+                    rectEl.className = `rounded-xl border-2 flex items-center justify-between px-1 py-0.5 relative shadow-sm transition transform shrink-0 ${isSelected ? 'highlight-rect ring-4 ring-amber-400 z-10 scale-[1.02]' : ''}`;
 
-                        // Center Op or Piece
-                        const centerEl = document.createElement('div');
-                        centerEl.style.cssText = "width: 32px; height: 30px;";
-                        if (rect.centerPiece) {
-                            const p = rect.centerPiece;
-                            centerEl.className = `flex items-center justify-center rounded font-board text-[10px] font-bold cursor-pointer shadow ${p.color === 'red' ? 'bg-rose-700 text-white' : 'bg-sky-600 text-white'}`;
-                            centerEl.innerText = p.label;
-                            centerEl.onclick = (e) => { e.stopPropagation(); handlePieceSelect(rowName, c, 'center'); };
+                    // Box 'a'
+                    const boxAEl = document.createElement('div');
+                    const hasAPiece = rect.aPiece !== null;
+                    const isPieceASelected = isSelected && gameState.selectedPiece.fromBox === 'a';
+                    let boxABg = hasAPiece 
+                        ? (rect.aPiece.color === 'red' ? 'bg-rose-600 text-white shadow' : 'bg-sky-600 text-white shadow') 
+                        : (isGreen ? 'bg-[#006850]/20 text-[var(--text-main)] border border-[var(--tile-dark-border)]' : 'bg-white/60 text-[var(--text-main)] border border-[var(--tile-light-border)]');
+                    
+                    boxAEl.style.width = '0.85cm';
+                    boxAEl.style.height = '1.1cm';
+                    boxAEl.className = `rounded-lg flex items-center justify-center font-board ${hasAPiece && (rect.aPiece.isInf || rect.aPiece.label.includes('∞')) ? 'text-xs font-black' : 'text-xs font-bold'} cursor-pointer transition shrink-0 ${boxABg} ${isPieceASelected ? 'ring-2 ring-amber-300 ring-offset-1 scale-105' : ''}`;
+                    boxAEl.innerText = hasAPiece ? rect.aPiece.label : 'a';
+                    
+                    boxAEl.onclick = (e) => { 
+                        e.stopPropagation(); 
+                        if (hasAPiece) {
+                            handlePieceSelect(rowName, c, 'a');
                         } else {
-                            centerEl.className = "flex items-center justify-center cursor-pointer font-black text-xs text-[var(--text-main)]";
-                            centerEl.innerText = rect.op;
-                            centerEl.onclick = (e) => { e.stopPropagation(); handleTargetRectClick(rowName, c); };
+                            handleBoxClick(rowName, c, 'a'); 
                         }
+                    };
 
-                        // Box B
-                        const boxBEl = document.createElement('div');
-                        const hasBP = rect.bPiece !== null;
-                        boxBEl.style.cssText = "width: 30px; height: 30px;";
-                        boxBEl.className = `rounded flex items-center justify-center font-board text-[10px] font-bold cursor-pointer transition ${hasBP ? (rect.bPiece.color === 'red' ? 'bg-rose-600 text-white shadow' : 'bg-sky-600 text-white shadow') : 'bg-white/50 text-[var(--text-main)] border border-[var(--border-card)]'}`;
-                        boxBEl.innerText = hasBP ? rect.bPiece.label : 'b';
-                        boxBEl.onclick = (e) => { e.stopPropagation(); hasBP ? handlePieceSelect(rowName, c, 'b') : handleBoxClick(rowName, c, 'b'); };
+                    // Center section (Starts with pieces, or displays operation)
+                    const centerEl = document.createElement('div');
+                    centerEl.style.width = '0.85cm';
+                    centerEl.style.height = '1.1cm';
+                    centerEl.className = "flex flex-col items-center justify-center cursor-pointer mx-auto shrink-0";
+                    
+                    if (rect.centerPiece) {
+                        const p = rect.centerPiece;
+                        const isCenterSelected = isSelected && gameState.selectedPiece.fromBox === 'center';
+                        const pBg = p.color === 'red' ? 'bg-rose-700 text-white' : 'bg-sky-600 text-white';
+                        const isInfText = p.isInf || p.label.includes('∞');
+                        centerEl.className += ` ${pBg} rounded-lg shadow font-board ${isInfText ? 'text-xs font-black' : 'text-xs font-bold'} flex items-center justify-center ${isCenterSelected ? 'ring-2 ring-amber-300 ring-offset-1 scale-105' : ''}`;
+                        centerEl.innerText = p.label;
+                        centerEl.onclick = (e) => { e.stopPropagation(); handlePieceSelect(rowName, c, 'center'); };
+                    } else {
+                        const opColorClass = 'text-[var(--text-main)] font-black';
+                        centerEl.innerHTML = `<span class="text-xs sm:text-sm font-board font-black ${opColorClass}">${rect.op}</span>`;
+                        centerEl.onclick = (e) => { e.stopPropagation(); handleTargetRectClick(rowName, c); };
+                    }
 
-                        rectEl.appendChild(boxAEl);
-                        rectEl.appendChild(centerEl);
-                        rectEl.appendChild(boxBEl);
-                        rowDiv.appendChild(rectEl);
-                    });
-                }
+                    // Box 'b'
+                    const boxBEl = document.createElement('div');
+                    const hasBPiece = rect.bPiece !== null;
+                    const isPieceBSelected = isSelected && gameState.selectedPiece.fromBox === 'b';
+                    let boxBBg = hasBPiece 
+                        ? (rect.bPiece.color === 'red' ? 'bg-rose-600 text-white shadow' : 'bg-sky-600 text-white shadow') 
+                        : (isGreen ? 'bg-[#006850]/20 text-[var(--text-main)] border border-[var(--tile-dark-border)]' : 'bg-white/60 text-[var(--text-main)] border border-[var(--tile-light-border)]');
+                    
+                    boxBEl.style.width = '0.85cm';
+                    boxBEl.style.height = '1.1cm';
+                    boxBEl.className = `rounded-lg flex items-center justify-center font-board ${hasBPiece && (rect.bPiece.isInf || rect.bPiece.label.includes('∞')) ? 'text-xs font-black' : 'text-xs font-bold'} cursor-pointer transition shrink-0 ${boxBBg} ${isPieceBSelected ? 'ring-2 ring-amber-300 ring-offset-1 scale-105' : ''}`;
+                    boxBEl.innerText = hasBPiece ? rect.bPiece.label : 'b';
+                    
+                    boxBEl.onclick = (e) => { 
+                        e.stopPropagation(); 
+                        if (hasBPiece) {
+                            handlePieceSelect(rowName, c, 'b');
+                        } else {
+                            handleBoxClick(rowName, c, 'b'); 
+                        }
+                    };
+
+                    rectEl.appendChild(boxAEl);
+                    rectEl.appendChild(centerEl);
+                    rectEl.appendChild(boxBEl);
+                    rowDiv.appendChild(rectEl);
+                });
+
                 container.appendChild(rowDiv);
-            };
-
-            renderRow('K', [], true, '+∞ ROAST DOMAIN');
-            ROW_NAMES.forEach(r => {
-                if (r !== 'K' && r !== 'A') renderRow(r, OPERATIONS_CONFIG[r]);
             });
-            renderRow('A', [], true, '-∞ COLD DOMAIN');
+
+            // Bottom infinity zone (Cold Domain)
+            const rA = document.createElement('div');
+            rA.className = "flex justify-center w-full";
+            const aPiece = gameState.board['A-0'].centerPiece;
+            rA.innerHTML = `
+                <div class="theme-btn-accent border-2 border-[var(--border-card)] font-black px-1 py-0.5 rounded-xl text-center shadow-md cursor-pointer transition text-xs tracking-wider flex items-center justify-center gap-1.5 shrink-0" style="width: 3.0cm; height: 1.4cm;" onclick="handleInfZoneClick('A')">
+                    <span class="font-black text-[10px] leading-tight flex-1 text-center">-∞ COLD DOMAIN</span>
+                    ${aPiece ? `<span class="bg-white text-sky-700 font-board px-1.5 py-0.5 rounded-lg text-xs font-black shadow cursor-pointer border border-sky-300 shrink-0" onclick="event.stopPropagation(); handlePieceSelect('A', 0, 'center')">${aPiece.label}</span>` : ''}
+                </div>
+            `;
+            container.appendChild(rA);
 
             updateUI();
-            autoFitBoard();
+            autoScaleBoard();
         }
 
         function updateUI() {
             document.getElementById('redScore').innerText = formatVal(gameState.redScore);
             document.getElementById('blueScore').innerText = formatVal(gameState.blueScore);
-            document.getElementById('turnIndicator').innerText = `TURN: ${gameState.turn === 'red' ? 'DARK ROAST (+)' : 'COLD BREW (-)'}`;
-            document.getElementById('turnIndicator').className = `px-3 py-0.5 rounded-full text-[10px] font-extrabold text-white uppercase tracking-wider text-center ${gameState.turn === 'red' ? 'bg-rose-700' : 'bg-sky-700'}`;
-            document.getElementById('redReadyBadge').innerText = gameState.redReady ? "READY ✓" : "Not Ready";
-            document.getElementById('blueReadyBadge').innerText = gameState.blueReady ? "READY ✓" : "Not Ready";
+            
+            const turnInd = document.getElementById('turnIndicator');
+            if (gameState.turn === 'red') {
+                turnInd.className = "px-3 py-0.5 rounded-full text-[10px] sm:text-xs font-extrabold bg-rose-700 text-white uppercase tracking-wider shadow-sm text-center truncate";
+                turnInd.innerText = "TURN: DARK ROAST (+)";
+            } else {
+                turnInd.className = "px-3 py-0.5 rounded-full text-[10px] sm:text-xs font-extrabold bg-sky-700 text-white uppercase tracking-wider shadow-sm text-center truncate";
+                turnInd.innerText = "TURN: COLD BREW (-)";
+            }
+            document.getElementById('moveCount').innerText = `Brewed: ${gameState.logs.length}`;
+
+            const redBadge = document.getElementById('redReadyBadge');
+            const blueBadge = document.getElementById('blueReadyBadge');
+            const redPauseBadge = document.getElementById('redPauseBadge');
+            const bluePauseBadge = document.getElementById('bluePauseBadge');
+            
+            if (redBadge) {
+                redBadge.innerText = gameState.redReady ? "READY ✓" : "Not Ready";
+                redBadge.className = gameState.redReady ? "text-[8px] bg-emerald-600 text-white font-bold px-1 py-0.5 rounded mr-1" : "text-[8px] bg-slate-200 text-slate-700 px-1 py-0.5 rounded mr-1";
+            }
+            if (blueBadge) {
+                blueBadge.innerText = gameState.blueReady ? "READY ✓" : "Not Ready";
+                blueBadge.className = gameState.blueReady ? "text-[8px] bg-emerald-600 text-white font-bold px-1 py-0.5 rounded ml-1" : "text-[8px] bg-slate-200 text-slate-700 px-1 py-0.5 rounded ml-1";
+            }
+            if (redPauseBadge) {
+                redPauseBadge.classList.toggle('hidden', !gameState.redPaused);
+            }
+            if (bluePauseBadge) {
+                bluePauseBadge.classList.toggle('hidden', !gameState.bluePaused);
+            }
+
+            const readyBtn = document.getElementById('readyBtn');
+            if (readyBtn) {
+                const mySideReady = gameState.playerSide === 'red' ? gameState.redReady : gameState.blueReady;
+                if (gameState.gameStarted) {
+                    readyBtn.innerText = "In Match";
+                    readyBtn.className = "bg-slate-500 text-white text-[10px] sm:text-xs font-bold px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg transition shadow-sm shrink-0 opacity-60";
+                } else if (mySideReady) {
+                    readyBtn.innerText = "Waiting...";
+                    readyBtn.className = "bg-amber-600 text-white text-[10px] sm:text-xs font-bold px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg transition shadow-sm shrink-0";
+                } else {
+                    readyBtn.innerText = "Ready / Start";
+                    readyBtn.className = "bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] sm:text-xs font-bold px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg transition shadow-sm shrink-0";
+                }
+            }
+
+            const pauseBtn = document.getElementById('pauseBtn');
+            if (pauseBtn) {
+                const myPaused = gameState.playerSide === 'red' ? gameState.redPaused : gameState.bluePaused;
+                pauseBtn.innerText = myPaused ? "Resume / Unpause" : "Pause";
+            }
         }
 
-        function autoFitBoard() {
+        // Perfect Responsive Board Auto Scaler - guarantees zero scrollbars
+        function autoScaleBoard() {
             const scaler = document.getElementById('boardScaler');
             const viewport = document.getElementById('boardViewport');
             if (!scaler || !viewport) return;
 
             scaler.style.transform = 'scale(1)';
-            const parentWidth = viewport.clientWidth - 10;
-            const parentHeight = viewport.clientHeight - 10;
-            const boardWidth = scaler.scrollWidth;
-            const boardHeight = scaler.scrollHeight;
+            
+            const availW = viewport.clientWidth - 12;
+            const availH = viewport.clientHeight - 12;
 
-            if (boardWidth === 0 || boardHeight === 0) return;
+            const boardW = scaler.scrollWidth;
+            const boardH = scaler.scrollHeight;
 
-            let scale = Math.min(parentWidth / boardWidth, parentHeight / boardHeight);
-            scale = Math.min(scale, 1.0);
+            if (boardW === 0 || boardH === 0) return;
+
+            const scaleX = availW / boardW;
+            const scaleY = availH / boardH;
+
+            let scale = Math.min(scaleX, scaleY);
+            scale = Math.min(scale, 1.0); // Never enlarge past original size
+            scale = Math.max(scale, 0.2); // Avoid negative or zero scale
+
             scaler.style.transform = `scale(${scale})`;
         }
 
-        window.addEventListener('resize', autoFitBoard);
+        window.addEventListener('resize', autoScaleBoard);
+        window.addEventListener('orientationchange', () => setTimeout(autoScaleBoard, 150));
 
+        /* 
+         * FIX 2 IMPLEMENTATION: Movement logic supporting center piece first-move!
+         */
         function isValidMove(fromRow, fromRect, fromBox, toRow, toRect, piece) {
             const fromOrd = ROW_ORDER_MAP[fromRow];
             const toOrd = ROW_ORDER_MAP[toRow];
 
-            if (fromRow === toRow && fromRect === toRect && fromBox !== 'center') return false;
+            // 1. First-move exception: If piece is in the center placement of the rectangle,
+            // moving to box 'a' or box 'b' of THAT SAME rectangle is EXPLICITLY VALID!
+            if (fromRow === toRow && fromRect === toRect) {
+                if (fromBox === 'center') {
+                    return true;
+                }
+                // Once a piece is inside box 'a' or 'b', moving within the same rectangle is not allowed.
+                return false;
+            }
 
+            // 2. Cannot occupy a box if your own color is already in that rectangle's other box, or both boxes are full
             if (toRow !== 'K' && toRow !== 'A') {
                 const destRect = gameState.board[`${toRow}-${toRect}`];
-                if (destRect && ((destRect.aPiece && destRect.aPiece.color === piece.color) || (destRect.bPiece && destRect.bPiece.color === piece.color) || (destRect.aPiece !== null && destRect.bPiece !== null))) {
-                    return false;
+                if (destRect) {
+                    if ((destRect.aPiece && destRect.aPiece.color === piece.color) || 
+                        (destRect.bPiece && destRect.bPiece.color === piece.color) ||
+                        (destRect.aPiece !== null && destRect.bPiece !== null)) {
+                        return false;
+                    }
                 }
             }
 
+            // 3. Infinity piece rook-like linear movement
+            if (piece.isInf) {
+                if (fromRow === toRow && fromRect === toRect) return false;
+                if (fromRow === toRow) {
+                    const minR = Math.min(fromRect, toRect);
+                    const maxR = Math.max(fromRect, toRect);
+                    for (let r = minR + 1; r < maxR; r++) {
+                        const midRect = gameState.board[`${fromRow}-${r}`];
+                        if (midRect && (midRect.centerPiece || midRect.aPiece || midRect.bPiece)) return false;
+                    }
+                    return true;
+                }
+                if (fromRect === toRect || (fromRow === 'K' || toRow === 'K' || fromRow === 'A' || toRow === 'A')) {
+                    const minOrd = Math.min(fromOrd, toOrd);
+                    const maxOrd = Math.max(fromOrd, toOrd);
+                    const rowKeys = Object.keys(ROW_ORDER_MAP).filter(k => ROW_ORDER_MAP[k] >= minOrd && ROW_ORDER_MAP[k] <= maxOrd);
+                    for (let i = 1; i < rowKeys.length - 1; i++) {
+                        const rName = rowKeys[i];
+                        if (rName !== 'K' && rName !== 'A') {
+                            const midRect = gameState.board[`${rName}-${fromRect}`];
+                            if (midRect && (midRect.centerPiece || midRect.aPiece || midRect.bPiece)) return false;
+                        }
+                    }
+                    return true;
+                }
+                return false;
+            }
+
+            // 4. Directional enforcement (Cannot move backward)
             if (piece.color === 'red' && toOrd < fromOrd) return false;
             if (piece.color === 'blue' && toOrd > fromOrd) return false;
 
             const rowDiff = Math.abs(toOrd - fromOrd);
             const rectDiff = Math.abs(toRect - fromRect);
-            if (rowDiff > 1 || rectDiff > 1 || (rowDiff === 0 && rectDiff === 0)) return false;
+
+            // Maximum step distance is 1 rectangle (forward or sideward, no diagonals)
+            if (rowDiff > 1 || rectDiff > 1 || (rowDiff === 1 && rectDiff === 1)) return false;
+
+            // 5. Alternating tile color rule (Dark to Light or Light to Dark)
+            // Exemption: If starting from initial 'center' placement, allow entry to adjacent tile without tile color restriction
+            if (fromBox !== 'center') {
+                const fromGreen = (fromRow === 'K' || fromRow === 'A') ? false : gameState.board[`${fromRow}-${fromRect}`]?.isGreen;
+                const toGreen = (toRow === 'K' || toRow === 'A') ? false : gameState.board[`${toRow}-${toRect}`]?.isGreen;
+                if (fromGreen === toGreen) return false;
+            }
 
             return true;
         }
 
         function handlePieceSelect(rowName, rectIdx, fromBox = 'center') {
             if (!gameState.gameStarted) {
-                showStatus("Click Ready to start first!");
+                showStatus("Both players must click Ready to start!");
                 return;
             }
+
+            if (gameState.gameMode === 'bot' && gameState.turn !== gameState.playerSide) return;
+            if (gameState.gameMode === 'online' && gameState.turn !== gameState.playerSide) {
+                showStatus("Not your turn!");
+                return;
+            }
+
             const rect = gameState.board[`${rowName}-${rectIdx}`];
-            let piece = fromBox === 'center' ? rect.centerPiece : fromBox === 'a' ? rect.aPiece : rect.bPiece;
-            if (!piece || piece.color !== gameState.turn) return;
+            if (!rect) return;
+
+            let piece = null;
+            if (fromBox === 'center') piece = rect.centerPiece;
+            else if (fromBox === 'a') piece = rect.aPiece;
+            else if (fromBox === 'b') piece = rect.bPiece;
+
+            if (!piece) return;
+
+            if (piece.color !== gameState.turn) {
+                showStatus(`It's ${gameState.turn.toUpperCase()}'s turn! You cannot select opponent pieces.`);
+                return;
+            }
+
+            if (gameState.selectedPiece && 
+                gameState.selectedPiece.rowName === rowName && 
+                gameState.selectedPiece.rectIdx === rectIdx && 
+                gameState.selectedPiece.fromBox === fromBox) {
+                gameState.selectedPiece = null;
+                showStatus("Piece deselected.");
+                renderBoard();
+                return;
+            }
 
             gameState.selectedPiece = { rowName, rectIdx, fromBox, piece };
-            showStatus(`Selected piece [${piece.label}]. Select target box.`);
+            showStatus(`Selected piece [${piece.label}]. Click box 'a' or 'b' to place it.`);
             renderBoard();
         }
 
         function handleBoxClick(rowName, rectIdx, box) {
-            if (!gameState.gameStarted || !gameState.selectedPiece) return;
-            const sel = gameState.selectedPiece;
+            if (!gameState.gameStarted) return;
+            if (gameState.gameMode === 'bot' && gameState.turn !== gameState.playerSide) return;
+            if (gameState.gameMode === 'online' && gameState.turn !== gameState.playerSide) return;
+
             const rect = gameState.board[`${rowName}-${rectIdx}`];
-            if (!rect || (box === 'a' ? rect.aPiece : rect.bPiece) !== null) return;
+            if (!rect) return;
+
+            const hasPiece = box === 'a' ? rect.aPiece !== null : rect.bPiece !== null;
+            if (hasPiece) {
+                const p = box === 'a' ? rect.aPiece : rect.bPiece;
+                if (p.color === gameState.turn) {
+                    handlePieceSelect(rowName, rectIdx, box);
+                    return;
+                }
+            }
+
+            if (!gameState.selectedPiece) {
+                showStatus("Select a piece first!");
+                return;
+            }
+
+            const sel = gameState.selectedPiece;
+            const targetBoxPiece = box === 'a' ? rect.aPiece : rect.bPiece;
+            if (targetBoxPiece !== null) {
+                showStatus(`Box (${box}) is already occupied!`);
+                return;
+            }
+
+            const otherBoxKey = box === 'a' ? 'bPiece' : 'aPiece';
+            if (rect[otherBoxKey] && rect[otherBoxKey].color === sel.piece.color) {
+                showStatus(`Invalid move! Box 'a' & 'b' cannot hold same color pieces.`);
+                return;
+            }
 
             if (isValidMove(sel.rowName, sel.rectIdx, sel.fromBox, rowName, rectIdx, sel.piece)) {
                 executeMove(sel.rowName, sel.rectIdx, sel.fromBox, rowName, rectIdx, box);
             } else {
-                showStatus("Invalid move!");
+                showStatus("Invalid move! Follow forward/sideward rules.");
             }
         }
 
         function handleTargetRectClick(rowName, rectIdx) {
             if (!gameState.gameStarted || !gameState.selectedPiece) return;
+            if (gameState.gameMode === 'bot' && gameState.turn !== gameState.playerSide) return;
+            if (gameState.gameMode === 'online' && gameState.turn !== gameState.playerSide) return;
+
             const sel = gameState.selectedPiece;
             const rect = gameState.board[`${rowName}-${rectIdx}`];
             if (!rect) return;
 
             if (isValidMove(sel.rowName, sel.rectIdx, sel.fromBox, rowName, rectIdx, sel.piece)) {
-                let choice = rect.aPiece === null ? 'a' : 'b';
-                executeMove(sel.rowName, sel.rectIdx, sel.fromBox, rowName, rectIdx, choice);
+                let availableBoxes = [];
+                if (rect.aPiece === null && (!rect.bPiece || rect.bPiece.color !== sel.piece.color)) availableBoxes.push('a');
+                if (rect.bPiece === null && (!rect.aPiece || rect.aPiece.color !== sel.piece.color)) availableBoxes.push('b');
+
+                if (availableBoxes.length === 0) {
+                    showStatus("Invalid move! Both boxes unavailable or occupied by your color.");
+                    return;
+                }
+
+                let choice = availableBoxes[0];
+                if (availableBoxes.length > 1) {
+                    choice = prompt(`Choose box placement: ${availableBoxes.join(' or ')}`, availableBoxes[0]);
+                }
+
+                if (choice === 'a' || choice === 'b') {
+                    if (!availableBoxes.includes(choice)) {
+                        showStatus(`Invalid box choice (${choice}).`);
+                        return;
+                    }
+
+                    const targetBoxKey = choice === 'a' ? 'aPiece' : 'bPiece';
+                    const oppBoxKey = choice === 'a' ? 'bPiece' : 'aPiece';
+
+                    if (rect[targetBoxKey] !== null || (rect[oppBoxKey] && rect[oppBoxKey].color === sel.piece.color)) {
+                        showStatus(`Selected box unavailable.`);
+                        return;
+                    }
+
+                    executeMove(sel.rowName, sel.rectIdx, sel.fromBox, rowName, rectIdx, choice);
+                }
+            } else {
+                showStatus("Invalid move!");
             }
         }
 
         function handleInfZoneClick(zone) {
             if (!gameState.gameStarted || !gameState.selectedPiece) return;
+            if (gameState.gameMode === 'bot' && gameState.turn !== gameState.playerSide) return;
+            if (gameState.gameMode === 'online' && gameState.turn !== gameState.playerSide) return;
+
             const sel = gameState.selectedPiece;
-            if (isValidMove(sel.rowName, sel.rectIdx, sel.fromBox, zone, 0, sel.piece)) {
-                executeMove(sel.rowName, sel.rectIdx, sel.fromBox, zone, 0, 'center');
+            const targetRow = zone === 'K' ? 'K' : 'A';
+            if (isValidMove(sel.rowName, sel.rectIdx, sel.fromBox, targetRow, 0, sel.piece)) {
+                executeMove(sel.rowName, sel.rectIdx, sel.fromBox, targetRow, 0, 'center');
+            } else {
+                showStatus("Cannot move to infinity domain from here.");
             }
         }
 
         function executeMove(fromRow, fromRect, fromBox, toRow, toRect, boxChoice) {
-            const fromKey = fromRow === 'K' || fromRow === 'A' ? `${fromRow}-0` : `${fromRow}-${fromRect}`;
-            const toKey = toRow === 'K' || toRow === 'A' ? `${toRow}-0` : `${toRow}-${toRect}`;
+            const fromKey = (fromRow === 'K' || fromRow === 'A') ? `${fromRow}-0` : `${fromRow}-${fromRect}`;
+            const toKey = (toRow === 'K' || toRow === 'A') ? `${toRow}-0` : `${toRow}-${toRect}`;
             const fromRectObj = gameState.board[fromKey];
             const toRectObj = gameState.board[toKey];
 
-            let piece = fromBox === 'center' ? fromRectObj.centerPiece : fromBox === 'a' ? fromRectObj.aPiece : fromRectObj.bPiece;
-            if (fromBox === 'center') fromRectObj.centerPiece = null;
-            else if (fromBox === 'a') fromRectObj.aPiece = null;
-            else fromRectObj.bPiece = null;
+            let piece = null;
+            if (fromBox === 'center') {
+                piece = fromRectObj.centerPiece;
+                fromRectObj.centerPiece = null;
+            } else if (fromBox === 'a') {
+                piece = fromRectObj.aPiece;
+                fromRectObj.aPiece = null;
+            } else if (fromBox === 'b') {
+                piece = fromRectObj.bPiece;
+                fromRectObj.bPiece = null;
+            }
 
-            if (toRow === 'K' || toRow === 'A') {
+            if ((piece.color === 'red' && toRow === 'K') || (piece.color === 'blue' && toRow === 'A')) {
                 piece.isInf = true;
-                piece.label = toRow === 'K' ? '+∞' : '-∞';
+                piece.label = piece.color === 'red' ? '+∞' : '-∞';
                 if (piece.color === 'red') gameState.redScore += 10;
                 else gameState.blueScore += 10;
                 toRectObj.centerPiece = piece;
+                logNotation(gameState.turn, `Move ${gameState.logs.length + 1}: ${piece.label}-${toRow}`, "Infinity Domain Reached (+10 pts)");
+            } else if (toRow === 'K' || toRow === 'A') {
+                toRectObj.centerPiece = piece;
             } else {
-                const oppBox = boxChoice === 'a' ? 'bPiece' : 'aPiece';
-                if (toRectObj[oppBox]) {
-                    resolveBinaryOp(toRectObj, piece, boxChoice);
+                let logMsg = "";
+                const targetBoxKey = boxChoice === 'a' ? 'aPiece' : 'bPiece';
+                const oppBoxKey = boxChoice === 'a' ? 'bPiece' : 'aPiece';
+
+                if (toRectObj[oppBoxKey]) {
+                    logMsg = resolveBinaryOp(toRectObj, piece, boxChoice);
                 } else {
-                    toRectObj[boxChoice === 'a' ? 'aPiece' : 'bPiece'] = piece;
+                    toRectObj[targetBoxKey] = piece;
+                    logMsg = `Moved to box (${boxChoice})`;
                 }
+
+                const notation = `${piece.label}-${toRow}${toRect + 1}${boxChoice}`;
+                logNotation(gameState.turn, notation, logMsg);
             }
 
             gameState.turn = gameState.turn === 'red' ? 'blue' : 'red';
             gameState.selectedPiece = null;
             renderBoard();
-            syncOnlineState();
+
+            if (gameState.gameMode === 'online') syncOnlineState();
+
+            if (gameState.gameStarted && !gameState.gamePaused && gameState.gameMode === 'bot' && gameState.turn !== gameState.playerSide) {
+                showStatus("Barista Bot thinking...");
+                setTimeout(runBotTurn, 500);
+            }
         }
 
         function resolveBinaryOp(rectObj, movingPiece, landingBox) {
             const oppBox = landingBox === 'a' ? 'bPiece' : 'aPiece';
             const oppPiece = rectObj[oppBox];
+
             const aPiece = landingBox === 'a' ? movingPiece : oppPiece;
             const bPiece = landingBox === 'a' ? oppPiece : movingPiece;
 
@@ -780,37 +1478,77 @@
             const op = rectObj.op;
 
             let result = 0;
-            if (op === '+') result = aVal + bVal;
-            else if (op === '-') result = aVal - bVal;
-            else if (op === '×') result = aVal * bVal;
-            else if (op === '÷') {
+            let resultType = 'neutral';
+
+            if (op === '+') {
+                if ((aVal === Infinity && bVal === -Infinity) || (aVal === -Infinity && bVal === Infinity)) {
+                    result = NaN;
+                } else {
+                    result = aVal + bVal;
+                }
+            } else if (op === '-') {
+                if ((aVal === Infinity && bVal === Infinity) || (aVal === -Infinity && bVal === -Infinity)) {
+                    result = NaN;
+                } else {
+                    result = aVal - bVal;
+                }
+            } else if (op === '×') {
+                if ((aVal === 0 && (bVal === Infinity || bVal === -Infinity)) || ((aVal === Infinity || aVal === -Infinity) && bVal === 0)) {
+                    result = NaN;
+                } else {
+                    result = aVal * bVal;
+                }
+            } else if (op === '÷') {
                 if (bVal === 0) {
-                    if (aVal === 0) result = 0;
-                    else if (Math.abs(aVal) === Infinity) result = aVal;
-                    else result = aVal > 0 ? Infinity : -Infinity;
-                } else if (Math.abs(bVal) === Infinity) {
-                    if (aVal === 0 || isFinite(aVal)) {
+                    if (aVal === 0) {
+                        result = 0;
+                    } else if (aVal === Infinity || aVal === -Infinity) {
+                        result = aVal;
+                    } else {
+                        result = aVal > 0 ? Infinity : -Infinity;
+                    }
+                } else if (bVal === Infinity || bVal === -Infinity) {
+                    if (aVal === 0 || (!isNaN(aVal) && isFinite(aVal))) {
                         rectObj.aPiece = null;
                         rectObj.bPiece = null;
-                        showStatus("k/∞ = 0 → Both pieces eliminated, no points.");
-                        return;
+                        return `Op: (${aPiece.label} ÷ ${bPiece.label}) = k/∞ → Result is 0, both pieces eliminated, no points awarded.`;
+                    } else {
+                        result = NaN;
                     }
-                    result = NaN;
+                } else if (aVal === 0) {
+                    result = 0;
+                } else if (aVal === Infinity || aVal === -Infinity) {
+                    result = aVal;
                 } else {
                     result = aVal / bVal;
                 }
             }
 
+            if (isNaN(result)) {
+                rectObj.aPiece = null;
+                rectObj.bPiece = null;
+                return `Op: (${aPiece.label} ${op} ${bPiece.label}) = Indeterminate → Both pieces eliminated.`;
+            }
+
             if (result === Infinity || result === -Infinity) {
                 movingPiece.isInf = true;
-                movingPiece.label = result > 0 ? '+∞' : '-∞';
+                movingPiece.label = result === Infinity ? '+∞' : '-∞';
                 rectObj[landingBox === 'a' ? 'aPiece' : 'bPiece'] = movingPiece;
                 rectObj[oppBox] = null;
+                return `Infinity yielded! Converted to ${movingPiece.label}.`;
             } else if (result > 0) {
+                resultType = 'positive';
+            } else if (result < 0) {
+                resultType = 'negative';
+            } else {
+                resultType = 'zero';
+            }
+
+            if (resultType === 'positive') {
                 gameState.redScore += Math.abs(result);
                 rectObj[landingBox === 'a' ? 'aPiece' : 'bPiece'] = movingPiece;
                 rectObj[oppBox] = null;
-            } else if (result < 0) {
+            } else if (resultType === 'negative') {
                 gameState.blueScore += Math.abs(result);
                 rectObj[landingBox === 'a' ? 'aPiece' : 'bPiece'] = movingPiece;
                 rectObj[oppBox] = null;
@@ -818,25 +1556,130 @@
                 rectObj.aPiece = null;
                 rectObj.bPiece = null;
             }
+
+            return `Op: (${aPiece.label} ${op} ${bPiece.label}) = ${formatVal(result)} → ${resultType === 'positive' ? 'Red Points, Opponent Eliminated' : resultType === 'negative' ? 'Blue Points, Opponent Eliminated' : 'Both Eliminated'}`;
+        }
+
+        function runBotTurn() {
+            if (!gameState.gameStarted || gameState.turn === gameState.playerSide) return;
+
+            const botColor = gameState.turn;
+            let allMoves = [];
+            const allKeys = Object.keys(gameState.board);
+
+            allKeys.forEach(k => {
+                const rect = gameState.board[k];
+                if (!rect) return;
+
+                if (rect.centerPiece && rect.centerPiece.color === botColor) {
+                    collectValidMovesForPiece(rect.rowName, rect.rectIdx, 'center', rect.centerPiece, allMoves);
+                }
+                if (rect.aPiece && rect.aPiece.color === botColor) {
+                    collectValidMovesForPiece(rect.rowName, rect.rectIdx, 'a', rect.aPiece, allMoves);
+                }
+                if (rect.bPiece && rect.bPiece.color === botColor) {
+                    collectValidMovesForPiece(rect.rowName, rect.rectIdx, 'b', rect.bPiece, allMoves);
+                }
+            });
+
+            if (allMoves.length === 0) {
+                showStatus("Bot has no valid moves. Turn passed.");
+                gameState.turn = gameState.turn === 'red' ? 'blue' : 'red';
+                renderBoard();
+                return;
+            }
+
+            let chosenMove = allMoves[Math.floor(Math.random() * allMoves.length)];
+            if (chosenMove) {
+                executeMove(chosenMove.fromRow, chosenMove.fromRect, chosenMove.fromBox, chosenMove.toRow, chosenMove.toRect, chosenMove.boxChoice);
+            }
+        }
+
+        function collectValidMovesForPiece(fromRow, fromRect, fromBox, piece, moveList) {
+            const allKeys = Object.keys(gameState.board);
+            allKeys.forEach(k => {
+                const parts = k.split('-');
+                const toRow = parts[0];
+                const toRect = parseInt(parts[1]);
+                if (toRow === 'K' || toRow === 'A') {
+                    if (isValidMove(fromRow, fromRect, fromBox, toRow, toRect, piece)) {
+                        moveList.push({ fromRow, fromRect, fromBox, toRow, toRect, boxChoice: 'center' });
+                    }
+                } else {
+                    const destRect = gameState.board[k];
+                    if (!destRect) return;
+
+                    if (isValidMove(fromRow, fromRect, fromBox, toRow, toRect, piece)) {
+                        if (destRect.aPiece === null && (!destRect.bPiece || destRect.bPiece.color !== piece.color)) {
+                            moveList.push({ fromRow, fromRect, fromBox, toRow, toRect, boxChoice: 'a' });
+                        }
+                        if (destRect.bPiece === null && (!destRect.aPiece || destRect.aPiece.color !== piece.color)) {
+                            moveList.push({ fromRow, fromRect, fromBox, toRow, toRect, boxChoice: 'b' });
+                        }
+                    }
+                }
+            });
+        }
+
+        function logNotation(player, moveStr, detailStr) {
+            gameState.logs.push({ player, moveStr, detailStr });
+            const container = document.getElementById('notationLog');
+            if (container) {
+                container.innerHTML = gameState.logs.map(l => `
+                    <div class="theme-card p-1 rounded-lg border text-[10px]">
+                        <div class="${l.player === 'red' ? 'text-rose-600 font-black' : 'text-sky-600 font-black'}">${l.moveStr}</div>
+                        <div class="text-[var(--text-muted)] text-[9px] mt-0.5 leading-tight">${l.detailStr}</div>
+                    </div>
+                `).join('');
+                container.scrollTop = container.scrollHeight;
+            }
         }
 
         function showStatus(msg) {
-            document.getElementById('statusMessage').innerText = msg;
+            const el = document.getElementById('statusMessage');
+            if (el) el.innerText = msg;
         }
 
         document.getElementById('configBtn').onclick = () => toggleModal('setupModal', true);
         document.getElementById('paletteBtn').onclick = () => toggleModal('paletteModal', true);
         document.getElementById('onlineBtn').onclick = () => toggleModal('onlineModal', true);
         document.getElementById('mechanicsBtn').onclick = () => toggleModal('mechanicsModal', true);
-        document.getElementById('readyBtn').onclick = () => toggleReadyState();
-        document.getElementById('pauseBtn').onclick = () => { gameState.gamePaused = !gameState.gamePaused; showStatus(gameState.gamePaused ? "Paused" : "Resumed"); };
-        document.getElementById('resetBtn').onclick = () => { initBoard(); renderBoard(); showStatus("Board reset."); };
+        document.getElementById('notationBtn').onclick = () => toggleModal('notationModal', true);
 
-        function toggleModal(id, show) {
-            document.getElementById(id).classList.toggle('hidden', !show);
+        document.getElementById('readyBtn').onclick = () => toggleReadyState();
+        document.getElementById('pauseBtn').onclick = () => togglePauseState();
+
+        document.getElementById('resetBtn').onclick = () => {
+            if (gameState.timerInterval) clearInterval(gameState.timerInterval);
+            gameState.gameStarted = false;
+            gameState.gamePaused = false;
+            gameState.redReady = false;
+            gameState.blueReady = false;
+            gameState.redPaused = false;
+            gameState.bluePaused = false;
+            gameState.turn = 'red';
+            gameState.redScore = 0;
+            gameState.blueScore = 0;
+            gameState.redTime = 15 * 60;
+            gameState.blueTime = 15 * 60;
+            gameState.logs = [];
+            initBoard();
+            renderBoard();
+            showStatus("Table reset. Both players click Ready to begin.");
+            if (gameState.gameMode === 'online') syncOnlineState();
+        };
+
+        function toggleModal(modalId, show) {
+            const m = document.getElementById(modalId);
+            if (m) m.classList.toggle('hidden', !show);
         }
 
-        window.onload = () => { initBoard(); renderBoard(); };
+        window.onload = function() {
+            initBoard();
+            renderBoard();
+            setTimeout(autoScaleBoard, 100);
+            setTimeout(autoScaleBoard, 300);
+        };
     </script>
 </body>
 </html>
