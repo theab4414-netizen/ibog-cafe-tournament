@@ -160,7 +160,6 @@
             border-color: #f59e0b !important;
         }
 
-        /* Custom scrollbar for small elements */
         ::-webkit-scrollbar {
             width: 5px;
             height: 5px;
@@ -180,14 +179,12 @@
 </head>
 <body data-theme="matcha" class="min-h-screen w-screen flex flex-col">
 
-    <!-- Header / Navbar -->
     <header class="sticky top-0 z-30 theme-card border-b px-2 py-1.5 sm:px-4 sm:py-2 flex justify-between items-center shadow-md shrink-0 gap-1">
         <div class="flex items-center gap-1.5 shrink-0">
             <span class="text-base sm:text-xl">☕</span>
             <h1 class="text-[11px] sm:text-xs md:text-sm font-black uppercase tracking-wider text-[var(--text-main)] truncate max-w-[100px] sm:max-w-none">IBOG CAFÉ</h1>
         </div>
 
-        <!-- Scrollable Mobile Button Action Bar -->
         <div class="flex items-center gap-1 overflow-x-auto no-scrollbar py-0.5 max-w-[75vw] sm:max-w-none">
             <button id="startBtn" class="bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] sm:text-xs font-bold px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg transition shadow-sm shrink-0">Start</button>
             <button id="pauseBtn" class="bg-amber-700 hover:bg-amber-800 text-white text-[10px] sm:text-xs font-bold px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg transition shadow-sm shrink-0">Pause</button>
@@ -204,13 +201,9 @@
         </div>
     </header>
 
-    <!-- Main Scrollable Container -->
     <main class="flex-1 flex flex-col xl:flex-row p-1.5 sm:p-3 gap-2.5 sm:gap-4 max-w-[1600px] mx-auto w-full items-center xl:items-start justify-start">
 
-        <!-- Left / Top Column: Interactive IBOG Board Section -->
         <div class="flex-1 flex flex-col items-center justify-start theme-card border rounded-2xl p-1.5 sm:p-3 shadow-sm w-full overflow-visible relative">
-            
-            <!-- Sticky / Top Bar for Turn Indicator & Draw Offers -->
             <div class="grid grid-cols-3 items-center w-full mb-1.5 px-1 shrink-0 gap-1">
                 <div class="text-[9px] sm:text-[11px] font-bold text-[var(--text-muted)] flex items-center justify-start gap-1 shrink-0">
                     <span class="w-2.5 h-2.5 rounded-full bg-sky-500 inline-block"></span> <span class="hidden xs:inline">Cold Brew</span> (-)
@@ -225,17 +218,12 @@
                 </div>
             </div>
 
-            <!-- Responsive Scaled Board Frame -->
             <div id="boardViewport" class="w-full flex items-center justify-center overflow-x-auto no-scrollbar py-1 relative min-h-[320px] sm:min-h-[420px]">
                 <div id="boardScaler" class="flex flex-col items-center justify-center transition-transform origin-top sm:origin-center my-auto">
-                    <!-- IBOG Board Container -->
-                    <div id="ibogBoard" class="flex flex-col gap-0.5 sm:gap-1 w-max items-center">
-                        <!-- Dynamically generated rows K to A -->
-                    </div>
+                    <div id="ibogBoard" class="flex flex-col gap-0.5 sm:gap-1 w-max items-center"></div>
                 </div>
             </div>
 
-            <!-- Bottom Board Controls -->
             <div class="flex justify-between items-center w-full mt-1.5 px-1 shrink-0 gap-1">
                 <button id="redDrawBtn" class="bg-rose-100 border border-rose-300 text-rose-800 hover:bg-rose-200 text-[9px] sm:text-[10px] font-bold px-2 py-1 rounded-lg transition shrink-0">Roast Draw</button>
                 <div id="statusMessage" class="text-[10px] sm:text-[11px] text-center text-[var(--text-muted)] theme-subcard px-2.5 py-1 rounded-xl border flex-1 max-w-sm font-medium truncate mx-1">
@@ -247,10 +235,7 @@
             </div>
         </div>
 
-        <!-- Right / Bottom Column: Clocks & Aroma Points + Recipe Ledger (Always Scrollable below board on portrait!) -->
         <div class="w-full xl:w-80 flex flex-col sm:flex-row xl:flex-col gap-2.5 sm:gap-3 shrink-0">
-            
-            <!-- Timers and Scores Panel -->
             <div class="theme-card border rounded-2xl p-2.5 sm:p-3 shadow-sm flex flex-col justify-center gap-2 flex-1 sm:flex-1 xl:flex-none">
                 <h3 class="font-bold text-xs uppercase tracking-wider text-[var(--text-main)] border-b border-[var(--border-card)] pb-1.5 flex items-center justify-between">
                     <span>CLOCKS & AROMA POINTS</span>
@@ -258,7 +243,6 @@
                 </h3>
                 
                 <div class="grid grid-cols-2 sm:grid-cols-1 gap-2">
-                    <!-- Dark Roast (+) Stats -->
                     <div class="theme-subcard border p-2 rounded-xl flex justify-between items-center">
                         <div>
                             <div class="text-[9px] sm:text-[10px] text-rose-600 font-extrabold uppercase tracking-wide">DARK ROAST (+)</div>
@@ -270,7 +254,6 @@
                         </div>
                     </div>
 
-                    <!-- Cold Brew (-) Stats -->
                     <div class="theme-subcard border p-2 rounded-xl flex justify-between items-center">
                         <div>
                             <div class="text-[9px] sm:text-[10px] text-sky-600 font-extrabold uppercase tracking-wide">COLD BREW (-)</div>
@@ -284,7 +267,6 @@
                 </div>
             </div>
 
-            <!-- Score Sheet / Recipe Ledger -->
             <div class="theme-card border rounded-2xl p-2.5 sm:p-3 shadow-sm flex flex-col flex-1 min-h-[200px] sm:min-h-[220px]">
                 <div class="flex justify-between items-center mb-1.5 pb-1.5 border-b border-[var(--border-card)]">
                     <h3 class="font-bold text-xs text-[var(--text-main)] uppercase tracking-wider flex items-center gap-1">
@@ -296,12 +278,11 @@
                     <div class="text-[var(--text-muted)] italic text-center py-8">Brewing logs populate here...</div>
                 </div>
             </div>
-
         </div>
 
     </main>
 
-    <!-- Theme Palette Switcher Modal -->
+    <!-- Theme Palette Modal -->
     <div id="paletteModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-3 hidden">
         <div class="theme-card border rounded-2xl max-w-md w-full p-4 sm:p-5 shadow-2xl space-y-3 max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center border-b border-[var(--border-card)] pb-2">
@@ -379,31 +360,15 @@
                 <p><strong>1. Objective:</strong> Compare rational numbers through binary operations to accumulate positive aroma points (Dark Roast) or negative points (Cold Brew).</p>
                 <p><strong>2. Turns:</strong> Dark Roast (+) pieces move first, followed by Cold Brew (-) pieces in alternating turns.</p>
                 <p><strong>3. Movement Rules:</strong> Pieces move forward or sideward to adjacent rectangles into box 'a' or box 'b'. Diagonal moves are NOT allowed. Pieces cannot move backward.</p>
-                <p><strong>4. Rectangle Color Rule (Boxes a & b):</strong> A single rectangle cannot contain two pieces of the same color across boxes 'a' and 'b'. Once one box is occupied, the other is off-limits to pieces of that same color.</p>
+                <p><strong>4. Rectangle Color Rule:</strong> A single rectangle cannot contain two pieces of the same color across boxes 'a' and 'b'. Once one box is occupied, the other is off-limits to pieces of that same color.</p>
                 <p><strong>5. Infinity Pieces:</strong> Reaching infinity zones (+∞ ROAST DOMAIN or -∞ COLD DOMAIN) or yielding infinity converts a piece to ∞, allowing rook-like unobstructed movement across rows and columns.</p>
-                <p><strong>6. Binary Operations:</strong> When opposing pieces meet in a rectangle (one in 'a', one in 'b'), a binary operation is triggered. Positive results credit Dark Roast, negative credit Cold Brew. Zero or indeterminate results eliminate both pieces.</p>
+                <p><strong>6. Binary Operations:</strong> When opposing pieces meet in a rectangle, a binary operation is triggered. Positive results credit Dark Roast, negative credit Cold Brew. Zero or indeterminate results eliminate both pieces.</p>
                 <p><strong>7. Time Control:</strong> Each player is given 15 minutes. Running out of time deducts 25 points.</p>
             </div>
         </div>
     </div>
 
-    <!-- Notation Guide Modal -->
-    <div id="notationModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-3 hidden">
-        <div class="theme-card border rounded-2xl max-w-xl w-full p-4 sm:p-5 shadow-2xl max-h-[85vh] overflow-y-auto">
-            <div class="flex justify-between items-center mb-2 border-b border-[var(--border-card)] pb-2">
-                <h2 class="text-sm sm:text-base font-bold text-[var(--text-main)]">Official Recipe Notation Guide</h2>
-                <button onclick="toggleModal('notationModal', false)" class="text-[var(--text-muted)] hover:text-[var(--text-main)] font-bold text-lg p-1">✕</button>
-            </div>
-            <div class="text-[11px] sm:text-xs text-[var(--text-main)] space-y-2 leading-relaxed">
-                <p><strong>Notation Format:</strong> [PieceValue]-[Row][Column][Box]</p>
-                <p><em>Example:</em> <code>-2-E7b</code> indicates piece value -2 moved to row E, column 7, box 'b'.</p>
-                <p><em>Infinity Notation:</em> <code>∞-K</code> or <code>∞-A</code> indicates conversion to infinity domain.</p>
-                <p><em>Operation Symbol:</em> Appended with operation symbol if binary operation occurred (e.g., <code>0.25-F4a÷</code>).</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Game Setup Modal -->
+    <!-- Setup Modal -->
     <div id="setupModal" class="fixed inset-0 bg-black/70 backdrop-blur-md z-50 flex items-center justify-center p-3">
         <div class="theme-card border rounded-2xl max-w-sm w-full p-4 sm:p-5 shadow-2xl space-y-3">
             <div class="border-b border-[var(--border-card)] pb-2">
@@ -445,14 +410,14 @@
         </div>
     </div>
 
-    <!-- Online Multiplayer Modal -->
+    <!-- Online Modal -->
     <div id="onlineModal" class="fixed inset-0 bg-black/70 backdrop-blur-md z-50 flex items-center justify-center p-3 hidden">
         <div class="theme-card border rounded-2xl max-w-sm w-full p-4 sm:p-5 shadow-2xl space-y-3 text-xs">
             <div class="flex justify-between items-center border-b border-[var(--border-card)] pb-2">
                 <h2 class="text-sm sm:text-base font-bold text-[var(--text-main)] uppercase tracking-wide">Online Café Match</h2>
                 <button onclick="toggleModal('onlineModal', false)" class="text-[var(--text-muted)] font-bold text-lg p-1">✕</button>
             </div>
-            <p class="text-[var(--text-muted)] text-[11px]">Create a room ID or join an existing game room.</p>
+            <p class="text-[var(--text-muted)] text-[11px]">Create a room ID or join an existing game room via Supabase.</p>
 
             <div class="space-y-2.5 pt-1">
                 <button onclick="createOnlineRoom()" class="w-full bg-purple-700 hover:bg-purple-800 text-white font-bold py-2 rounded-xl transition shadow text-xs uppercase tracking-wider">Create New Room</button>
@@ -480,36 +445,17 @@
         </div>
     </div>
 
-    <!-- Firebase SDK Imports -->
+    <!-- Supabase Realtime SDK Integration -->
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, onSnapshot, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'ibog-cafe-app';
-        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+        const SUPABASE_URL = "https://qhrhcamtjkmgfsglttsp.supabase.co";
+        const SUPABASE_ANON_KEY = "sb_publishable_6tw_6l-2Dh4Vwz_iS2trNw_TwBF5NkM";
 
-        let app, db, auth;
-        let isFirebaseInitialized = false;
-
-        try {
-            app = initializeApp(firebaseConfig);
-            db = getFirestore(app);
-            auth = getAuth(app);
-            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                signInWithCustomToken(auth, __initial_auth_token).catch(() => signInAnonymously(auth));
-            } else {
-                signInAnonymously(auth);
-            }
-            isFirebaseInitialized = true;
-        } catch(e) {
-            console.warn("Firebase initialization skipped:", e);
-        }
-
-        window.fb = { db, auth, doc, setDoc, getDoc, onSnapshot, updateDoc, isFirebaseInitialized, appId };
+        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        window.supabaseClient = supabase;
     </script>
 
-    <!-- JavaScript Application Logic -->
     <script>
         const ROW_NAMES = ['K', 'J', 'I', 'H', 'G', 'F', 'E', 'D', 'C', 'B', 'A'];
         const ROW_ORDER_MAP = { 'K': 10, 'J': 9, 'I': 8, 'H': 7, 'G': 6, 'F': 5, 'E': 4, 'D': 3, 'C': 2, 'B': 1, 'A': 0 };
@@ -536,15 +482,13 @@
             blueTime: 15 * 60,
             timerInterval: null,
             selectedPiece: null,
-            moveNumber: 1,
             logs: [],
             board: {},
             gameMode: '2p',
             botDifficulty: 'medium',
             playerSide: 'red',
             onlineRoomId: null,
-            onlineRole: null,
-            unsubscribeFirestore: null
+            onlineRole: null
         };
 
         function setTheme(themeName) {
@@ -615,8 +559,8 @@
         }
 
         async function createOnlineRoom() {
-            if (!window.fb || !window.fb.isFirebaseInitialized) {
-                showStatus("Online multiplayer requires Firebase.");
+            if (!window.supabaseClient) {
+                showStatus("Supabase client not initialized.");
                 return;
             }
             const roomId = Math.random().toString(36).substring(2, 8).toUpperCase();
@@ -637,107 +581,113 @@
                 gameStarted: false,
                 gamePaused: false,
                 logs: [],
-                hostJoined: true,
-                guestJoined: false,
-                updatedAt: Date.now()
+                guestJoined: false
             };
 
-            try {
-                const docRef = window.fb.doc(window.fb.db, 'artifacts', window.fb.appId, 'public', 'data', 'rooms', roomId);
-                await window.fb.setDoc(docRef, roomData);
+            const { error } = await window.supabaseClient
+                .from('rooms')
+                .insert([{ id: roomId, data: roomData }]);
 
-                document.getElementById('roomInfoContainer').classList.remove('hidden');
-                document.getElementById('displayRoomId').innerText = roomId;
-                document.getElementById('roomStatusText').innerText = "Waiting for guest...";
-                
-                subscribeToOnlineRoom(roomId);
-                showStatus(`Online Room created! ID: ${roomId}`);
-            } catch (e) {
-                showStatus("Failed to create online room.");
+            if (error) {
+                showStatus("Failed to create room.");
+                return;
             }
+
+            document.getElementById('roomInfoContainer').classList.remove('hidden');
+            document.getElementById('displayRoomId').innerText = roomId;
+            document.getElementById('roomStatusText').innerText = "Waiting for guest to join...";
+            
+            subscribeToOnlineRoom(roomId);
+            showStatus(`Online Room created! ID: ${roomId}`);
         }
 
         async function joinOnlineRoom() {
             const roomId = document.getElementById('roomIdInput').value.trim().toUpperCase();
-            if (!roomId || !window.fb || !window.fb.isFirebaseInitialized) return;
+            if (!roomId || !window.supabaseClient) return;
 
-            try {
-                const docRef = window.fb.doc(window.fb.db, 'artifacts', window.fb.appId, 'public', 'data', 'rooms', roomId);
-                const docSnap = await window.fb.getDoc(docRef);
+            const { data, error } = await window.supabaseClient
+                .from('rooms')
+                .select('*')
+                .eq('id', roomId)
+                .single();
 
-                if (!docSnap.exists()) {
-                    showStatus("Room not found!");
-                    return;
-                }
-
-                gameState.onlineRoomId = roomId;
-                gameState.onlineRole = 'guest';
-                gameState.playerSide = 'blue';
-                gameState.gameMode = 'online';
-
-                await window.fb.updateDoc(docRef, { guestJoined: true });
-
-                document.getElementById('roomInfoContainer').classList.remove('hidden');
-                document.getElementById('displayRoomId').innerText = roomId;
-                document.getElementById('roomStatusText').innerText = "Connected to room as Cold Brew!";
-                toggleModal('onlineModal', false);
-
-                subscribeToOnlineRoom(roomId);
-                showStatus("Joined online room successfully!");
-            } catch (e) {
-                showStatus("Failed to join room.");
+            if (error || !data) {
+                showStatus("Room not found!");
+                return;
             }
+
+            gameState.onlineRoomId = roomId;
+            gameState.onlineRole = 'guest';
+            gameState.playerSide = 'blue';
+            gameState.gameMode = 'online';
+
+            let roomData = data.data;
+            roomData.guestJoined = true;
+
+            await window.supabaseClient
+                .from('rooms')
+                .update({ data: roomData })
+                .eq('id', roomId);
+
+            document.getElementById('roomInfoContainer').classList.remove('hidden');
+            document.getElementById('displayRoomId').innerText = roomId;
+            document.getElementById('roomStatusText').innerText = "Connected as Cold Brew!";
+            toggleModal('onlineModal', false);
+
+            subscribeToOnlineRoom(roomId);
+            showStatus("Joined online room successfully!");
+        }
+
+        function subscribeToOnlineRoom(roomId) {
+            window.supabaseClient
+                .channel('room_channel_' + roomId)
+                .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'rooms', filter: `id=eq.${roomId}` }, (payload) => {
+                    const roomData = payload.new.data;
+                    gameState.turn = roomData.turn;
+                    gameState.redScore = roomData.redScore;
+                    gameState.blueScore = roomData.blueScore;
+                    gameState.redTime = roomData.redTime;
+                    gameState.blueTime = roomData.blueTime;
+                    gameState.gameStarted = roomData.gameStarted;
+                    gameState.gamePaused = roomData.gamePaused;
+                    gameState.logs = roomData.logs || [];
+                    
+                    deserializeBoard(roomData.board);
+                    renderBoard();
+
+                    if (roomData.guestJoined && gameState.onlineRole === 'host') {
+                        document.getElementById('roomStatusText').innerText = "Guest connected! Match ready.";
+                    }
+                })
+                .subscribe();
+        }
+
+        async function syncOnlineState() {
+            if (gameState.gameMode !== 'online' || !gameState.onlineRoomId || !window.supabaseClient) return;
+
+            const roomData = {
+                board: serializeBoard(),
+                turn: gameState.turn,
+                redScore: gameState.redScore,
+                blueScore: gameState.blueScore,
+                redTime: gameState.redTime,
+                blueTime: gameState.blueTime,
+                gameStarted: gameState.gameStarted,
+                gamePaused: gameState.gamePaused,
+                logs: gameState.logs,
+                guestJoined: true
+            };
+
+            await window.supabaseClient
+                .from('rooms')
+                .update({ data: roomData })
+                .eq('id', gameState.onlineRoomId);
         }
 
         function copyRoomId() {
             const idText = document.getElementById('displayRoomId').innerText;
             if (navigator.clipboard) navigator.clipboard.writeText(idText);
             showStatus("Room ID copied!");
-        }
-
-        function subscribeToOnlineRoom(roomId) {
-            if (gameState.unsubscribeFirestore) gameState.unsubscribeFirestore();
-
-            const docRef = window.fb.doc(window.fb.db, 'artifacts', window.fb.appId, 'public', 'data', 'rooms', roomId);
-            gameState.unsubscribeFirestore = window.fb.onSnapshot(docRef, (docSnap) => {
-                if (!docSnap.exists()) return;
-                const data = docSnap.data();
-
-                gameState.turn = data.turn;
-                gameState.redScore = data.redScore;
-                gameState.blueScore = data.blueScore;
-                gameState.redTime = data.redTime;
-                gameState.blueTime = data.blueTime;
-                gameState.gameStarted = data.gameStarted;
-                gameState.gamePaused = data.gamePaused;
-                gameState.logs = data.logs || [];
-                
-                deserializeBoard(data.board);
-                renderBoard();
-
-                if (data.guestJoined && gameState.onlineRole === 'host') {
-                    document.getElementById('roomStatusText').innerText = "Guest connected! Match ready.";
-                }
-            });
-        }
-
-        async function syncOnlineState() {
-            if (gameState.gameMode !== 'online' || !gameState.onlineRoomId || !window.fb) return;
-            const docRef = window.fb.doc(window.fb.db, 'artifacts', window.fb.appId, 'public', 'data', 'rooms', gameState.onlineRoomId);
-            try {
-                await window.fb.updateDoc(docRef, {
-                    board: serializeBoard(),
-                    turn: gameState.turn,
-                    redScore: gameState.redScore,
-                    blueScore: gameState.blueScore,
-                    redTime: gameState.redTime,
-                    blueTime: gameState.blueTime,
-                    gameStarted: gameState.gameStarted,
-                    gamePaused: gameState.gamePaused,
-                    logs: gameState.logs,
-                    updatedAt: Date.now()
-                });
-            } catch(e) { console.debug("Sync error", e); }
         }
 
         function serializeBoard() {
@@ -780,18 +730,8 @@
                 if (!gameState.gameStarted || gameState.gamePaused) return;
                 if (gameState.turn === 'red') {
                     gameState.redTime--;
-                    if (gameState.redTime <= 0) {
-                        gameState.redTime = 0;
-                        clearInterval(gameState.timerInterval);
-                        handleTimeOut('red');
-                    }
                 } else {
                     gameState.blueTime--;
-                    if (gameState.blueTime <= 0) {
-                        gameState.blueTime = 0;
-                        clearInterval(gameState.timerInterval);
-                        handleTimeOut('blue');
-                    }
                 }
                 updateTimerDisplay();
                 if (gameState.gameMode === 'online' && gameState.onlineRole === 'host') {
@@ -810,19 +750,6 @@
             document.getElementById('blueTimer').innerText = fmt(gameState.blueTime);
         }
 
-        function handleTimeOut(color) {
-            if (color === 'red') {
-                gameState.redScore -= 25;
-                gameState.blueScore += 25;
-                showStatus("Dark Roast ran out of time! (-25 pts)");
-            } else {
-                gameState.blueScore -= 25;
-                gameState.redScore += 25;
-                showStatus("Cold Brew ran out of time! (-25 pts)");
-            }
-            updateUI();
-        }
-
         function parseVal(str) {
             if (str === 'inf' || str === 'INF+') return Infinity;
             if (str === '-inf' || str === 'INF-') return -Infinity;
@@ -837,10 +764,6 @@
             if (val === Infinity) return '+∞';
             if (val === -Infinity) return '-∞';
             if (isNaN(val)) return 'Indet';
-            if (val === 0.5) return '1/2';
-            if (val === -0.5) return '-1/2';
-            if (val === 0.25) return '0.25';
-            if (val === -0.25) return '-0.25';
             return val.toString();
         }
 
@@ -857,7 +780,6 @@
             });
             gameState.board['A-0'] = { rowName: 'A', rectIdx: 0, op: '-∞ COLD DOMAIN', centerPiece: null, aPiece: null, bPiece: null, isGreen: false };
 
-            // Pieces initial setup
             gameState.board['J-0'].centerPiece = { color: 'blue', val: '5', label: '5', isInf: false };
             gameState.board['J-1'].centerPiece = { color: 'blue', val: '0', label: '0', isInf: false };
             gameState.board['J-2'].centerPiece = { color: 'blue', val: '-5', label: '-5', isInf: false };
@@ -893,19 +815,17 @@
             const container = document.getElementById('ibogBoard');
             container.innerHTML = '';
 
-            // Render Row K (+∞ ROAST DOMAIN)
             const rK = document.createElement('div');
             rK.className = "flex justify-center mb-1 w-full";
             const kPiece = gameState.board['K-0'].centerPiece;
             rK.innerHTML = `
                 <div class="theme-btn-accent border-2 border-[var(--border-card)] font-black px-1 py-0.5 rounded-xl text-center shadow-md cursor-pointer transition text-xs tracking-wider flex items-center justify-center gap-1.5 shrink-0" style="width: 3.2cm; height: 1.8cm;" onclick="handleInfZoneClick('K')">
                     <span class="font-black text-[10px] leading-tight flex-1 text-center">+∞ ROAST DOMAIN</span>
-                    ${kPiece ? `<span class="bg-white text-rose-700 font-board px-1.5 py-0.5 rounded-lg text-xs font-black shadow cursor-pointer border border-rose-300 shrink-0" onclick="event.stopPropagation(); handlePieceSelect('K', 0, 'center')">${kPiece.label}</span>` : ''}
+                    ${kPiece ? `<span class="bg-white text-rose-700 font-board px-1.5 py-0.5 rounded-lg text-xs font-black shadow cursor-pointer border border-rose-300 shrink-0">${kPiece.label}</span>` : ''}
                 </div>
             `;
             container.appendChild(rK);
 
-            // Render Rows J down to B
             const middleRows = ['J', 'I', 'H', 'G', 'F', 'E', 'D', 'C', 'B'];
             middleRows.forEach(rowName => {
                 const rowDiv = document.createElement('div');
@@ -922,7 +842,6 @@
                     const isSelected = gameState.selectedPiece && gameState.selectedPiece.rowName === rowName && gameState.selectedPiece.rectIdx === c;
 
                     const rectEl = document.createElement('div');
-                    
                     let bgStyle = isGreen 
                         ? 'background-color: var(--tile-dark-bg); border-color: var(--tile-dark-border);' 
                         : 'background-color: var(--tile-light-bg); border-color: var(--tile-light-border);';
@@ -930,7 +849,6 @@
                     rectEl.style.cssText = `width: 3.2cm; height: 1.8cm; ${bgStyle}`;
                     rectEl.className = `rounded-xl border-2 flex items-center justify-between px-1 py-0.5 relative shadow-sm transition transform shrink-0 ${isSelected ? 'highlight-rect ring-4 ring-amber-400 z-10 scale-[1.02]' : ''}`;
 
-                    // Box A
                     const boxAEl = document.createElement('div');
                     const hasAPiece = rect.aPiece !== null;
                     const isPieceASelected = isSelected && gameState.selectedPiece.fromBox === 'a';
@@ -944,7 +862,6 @@
                     boxAEl.innerText = hasAPiece ? rect.aPiece.label : 'a';
                     boxAEl.onclick = (e) => { e.stopPropagation(); handleBoxClick(rowName, c, 'a'); };
 
-                    // Center Piece / Symbol
                     const centerEl = document.createElement('div');
                     centerEl.style.width = '0.98cm';
                     centerEl.style.height = '1.3cm';
@@ -964,7 +881,6 @@
                         centerEl.onclick = (e) => { e.stopPropagation(); handleTargetRectClick(rowName, c); };
                     }
 
-                    // Box B
                     const boxBEl = document.createElement('div');
                     const hasBPiece = rect.bPiece !== null;
                     const isPieceBSelected = isSelected && gameState.selectedPiece.fromBox === 'b';
@@ -987,14 +903,13 @@
                 container.appendChild(rowDiv);
             });
 
-            // Render Row A (-∞ COLD DOMAIN)
             const rA = document.createElement('div');
             rA.className = "flex justify-center mt-1 w-full";
             const aPiece = gameState.board['A-0'].centerPiece;
             rA.innerHTML = `
                 <div class="theme-btn-accent border-2 border-[var(--border-card)] font-black px-1 py-0.5 rounded-xl text-center shadow-md cursor-pointer transition text-xs tracking-wider flex items-center justify-center gap-1.5 shrink-0" style="width: 3.2cm; height: 1.8cm;" onclick="handleInfZoneClick('A')">
                     <span class="font-black text-[10px] leading-tight flex-1 text-center">-∞ COLD DOMAIN</span>
-                    ${aPiece ? `<span class="bg-white text-sky-700 font-board px-1.5 py-0.5 rounded-lg text-xs font-black shadow cursor-pointer border border-sky-300 shrink-0" onclick="event.stopPropagation(); handlePieceSelect('A', 0, 'center')">${aPiece.label}</span>` : ''}
+                    ${aPiece ? `<span class="bg-white text-sky-700 font-board px-1.5 py-0.5 rounded-lg text-xs font-black shadow cursor-pointer border border-sky-300 shrink-0">${aPiece.label}</span>` : ''}
                 </div>
             `;
             container.appendChild(rA);
@@ -1018,28 +933,22 @@
             document.getElementById('moveCount').innerText = `Brewed: ${gameState.logs.length}`;
         }
 
-        /* Improved Smart Responsive Board Scaler for Portrait & Landscape */
         function autoScaleBoard() {
             const scaler = document.getElementById('boardScaler');
             const viewport = document.getElementById('boardViewport');
             if (!scaler || !viewport) return;
 
             scaler.style.transform = 'scale(1)';
-            
             const parentWidth = viewport.clientWidth - 8;
             const boardWidth = scaler.scrollWidth;
 
             if (boardWidth === 0) return;
 
-            // Compute ideal scale factor based on screen width
             let scale = parentWidth / boardWidth;
-
-            // In portrait mode, prevent extreme shrinking so tiles stay readable & tap-friendly
             const isPortrait = window.innerHeight > window.innerWidth;
             if (isPortrait) {
-                scale = Math.max(scale, 0.38); // Keep clear readable size on phones
+                scale = Math.max(scale, 0.38);
             } else {
-                // In landscape mode, balance scale against available height
                 const parentHeight = window.innerHeight * 0.75;
                 const boardHeight = scaler.scrollHeight;
                 if (boardHeight > 0) {
@@ -1049,74 +958,13 @@
                 scale = Math.max(scale, 0.32);
             }
 
-            scale = Math.min(scale, 1.0); // Don't over-scale on large displays
+            scale = Math.min(scale, 1.0);
             scaler.style.transform = `scale(${scale})`;
-            
-            // Adjust viewport container height based on scaled board height
-            const scaledHeight = scaler.scrollHeight * scale;
-            viewport.style.height = `${scaledHeight + 16}px`;
+            viewport.style.height = `${(scaler.scrollHeight * scale) + 16}px`;
         }
 
         window.addEventListener('resize', autoScaleBoard);
         window.addEventListener('orientationchange', () => setTimeout(autoScaleBoard, 200));
-
-        // --- GAME LOGIC & RULES ---
-        function isValidMove(fromRow, fromRect, fromBox, toRow, toRect, piece) {
-            const fromOrd = ROW_ORDER_MAP[fromRow];
-            const toOrd = ROW_ORDER_MAP[toRow];
-
-            if (toRow !== 'K' && toRow !== 'A') {
-                const destRect = gameState.board[`${toRow}-${toRect}`];
-                if (destRect) {
-                    if ((destRect.aPiece && destRect.aPiece.color === piece.color) || 
-                        (destRect.bPiece && destRect.bPiece.color === piece.color) ||
-                        (destRect.aPiece !== null && destRect.bPiece !== null)) {
-                        return false;
-                    }
-                }
-            }
-
-            if (piece.isInf) {
-                if (fromRow === toRow && fromRect === toRect) return false;
-                if (fromRow === toRow) {
-                    const minR = Math.min(fromRect, toRect);
-                    const maxR = Math.max(fromRect, toRect);
-                    for (let r = minR + 1; r < maxR; r++) {
-                        const midRect = gameState.board[`${fromRow}-${r}`];
-                        if (midRect && (midRect.centerPiece || midRect.aPiece || midRect.bPiece)) return false;
-                    }
-                    return true;
-                }
-                if (fromRect === toRect || (fromRow === 'K' || toRow === 'K' || fromRow === 'A' || toRow === 'A')) {
-                    const minOrd = Math.min(fromOrd, toOrd);
-                    const maxOrd = Math.max(fromOrd, toOrd);
-                    const rowKeys = Object.keys(ROW_ORDER_MAP).filter(k => ROW_ORDER_MAP[k] >= minOrd && ROW_ORDER_MAP[k] <= maxOrd);
-                    for (let i = 1; i < rowKeys.length - 1; i++) {
-                        const rName = rowKeys[i];
-                        if (rName !== 'K' && rName !== 'A') {
-                            const midRect = gameState.board[`${rName}-${fromRect}`];
-                            if (midRect && (midRect.centerPiece || midRect.aPiece || midRect.bPiece)) return false;
-                        }
-                    }
-                    return true;
-                }
-                return false;
-            }
-
-            if (piece.color === 'red' && toOrd < fromOrd) return false;
-            if (piece.color === 'blue' && toOrd > fromOrd) return false;
-
-            const rowDiff = Math.abs(toOrd - fromOrd);
-            const rectDiff = Math.abs(toRect - fromRect);
-
-            if (rowDiff > 1 || rectDiff > 1 || (rowDiff === 0 && rectDiff === 0)) return false;
-
-            const fromGreen = fromRow === 'K' || fromRow === 'A' ? false : gameState.board[`${fromRow}-${fromRect}`]?.isGreen;
-            const toGreen = toRow === 'K' || toRow === 'A' ? false : gameState.board[`${toRow}-${toRect}`]?.isGreen;
-            if (fromGreen === toGreen) return false;
-
-            return true;
-        }
 
         function handlePieceSelect(rowName, rectIdx, fromBox = 'center') {
             if (!gameState.gameStarted) {
@@ -1133,15 +981,11 @@
             const rect = gameState.board[`${rowName}-${rectIdx}`];
             if (!rect) return;
 
-            let piece = null;
-            if (fromBox === 'center') piece = rect.centerPiece;
-            else if (fromBox === 'a') piece = rect.aPiece;
-            else if (fromBox === 'b') piece = rect.bPiece;
-
+            let piece = fromBox === 'center' ? rect.centerPiece : (fromBox === 'a' ? rect.aPiece : rect.bPiece);
             if (!piece) return;
 
             if (piece.color !== gameState.turn) {
-                showStatus(`It's ${gameState.turn.toUpperCase()}'s turn! You cannot select opponent pieces.`);
+                showStatus(`It's ${gameState.turn.toUpperCase()}'s turn!`);
                 return;
             }
 
@@ -1156,50 +1000,16 @@
             }
 
             gameState.selectedPiece = { rowName, rectIdx, fromBox, piece };
-            showStatus(`Selected piece [${piece.label}]. Select target box.`);
+            showStatus(`Selected [${piece.label}]. Select target box.`);
             renderBoard();
         }
 
         function handleBoxClick(rowName, rectIdx, box) {
-            if (!gameState.gameStarted) return;
+            if (!gameState.gameStarted || !gameState.selectedPiece) return;
             if (gameState.gameMode === 'bot' && gameState.turn !== gameState.playerSide) return;
             if (gameState.gameMode === 'online' && gameState.turn !== gameState.playerSide) return;
 
-            const rect = gameState.board[`${rowName}-${rectIdx}`];
-            if (!rect) return;
-
-            const hasPiece = box === 'a' ? rect.aPiece !== null : rect.bPiece !== null;
-            if (hasPiece) {
-                const p = box === 'a' ? rect.aPiece : rect.bPiece;
-                if (p.color === gameState.turn) {
-                    handlePieceSelect(rowName, rectIdx, box);
-                    return;
-                }
-            }
-
-            if (!gameState.selectedPiece) {
-                showStatus("Select a piece first!");
-                return;
-            }
-
-            const sel = gameState.selectedPiece;
-            const targetBoxPiece = box === 'a' ? rect.aPiece : rect.bPiece;
-            if (targetBoxPiece !== null) {
-                showStatus(`Box (${box}) is already occupied!`);
-                return;
-            }
-
-            const otherBoxKey = box === 'a' ? 'bPiece' : 'aPiece';
-            if (rect[otherBoxKey] && rect[otherBoxKey].color === sel.piece.color) {
-                showStatus(`Invalid move! Box 'a' & 'b' cannot hold same color pieces.`);
-                return;
-            }
-
-            if (isValidMove(sel.rowName, sel.rectIdx, sel.fromBox, rowName, rectIdx, sel.piece)) {
-                executeMove(sel.rowName, sel.rectIdx, sel.fromBox, rowName, rectIdx, box);
-            } else {
-                showStatus("Invalid move! Follow forward/sideward dark/light alternating rule.");
-            }
+            executeMove(gameState.selectedPiece.rowName, gameState.selectedPiece.rectIdx, gameState.selectedPiece.fromBox, rowName, rectIdx, box);
         }
 
         function handleTargetRectClick(rowName, rectIdx) {
@@ -1207,237 +1017,37 @@
             if (gameState.gameMode === 'bot' && gameState.turn !== gameState.playerSide) return;
             if (gameState.gameMode === 'online' && gameState.turn !== gameState.playerSide) return;
 
-            const sel = gameState.selectedPiece;
-            const rect = gameState.board[`${rowName}-${rectIdx}`];
-            if (!rect) return;
-
-            if (isValidMove(sel.rowName, sel.rectIdx, sel.fromBox, rowName, rectIdx, sel.piece)) {
-                let availableBoxes = [];
-                if (rect.aPiece === null && (!rect.bPiece || rect.bPiece.color !== sel.piece.color)) availableBoxes.push('a');
-                if (rect.bPiece === null && (!rect.aPiece || rect.aPiece.color !== sel.piece.color)) availableBoxes.push('b');
-
-                if (availableBoxes.length === 0) {
-                    showStatus("Invalid move! Both boxes unavailable or occupied by your color.");
-                    return;
-                }
-
-                let choice = availableBoxes[0];
-                if (availableBoxes.length > 1) {
-                    choice = prompt(`Choose box placement: ${availableBoxes.join(' or ')}`, availableBoxes[0]);
-                }
-
-                if (choice === 'a' || choice === 'b') {
-                    if (!availableBoxes.includes(choice)) {
-                        showStatus(`Invalid box choice (${choice}).`);
-                        return;
-                    }
-
-                    const targetBoxKey = choice === 'a' ? 'aPiece' : 'bPiece';
-                    const oppBoxKey = choice === 'a' ? 'bPiece' : 'aPiece';
-
-                    if (rect[targetBoxKey] !== null || (rect[oppBoxKey] && rect[oppBoxKey].color === sel.piece.color)) {
-                        showStatus(`Selected box unavailable.`);
-                        return;
-                    }
-
-                    executeMove(sel.rowName, sel.rectIdx, sel.fromBox, rowName, rectIdx, choice);
-                }
-            } else {
-                showStatus("Invalid move!");
-            }
+            executeMove(gameState.selectedPiece.rowName, gameState.selectedPiece.rectIdx, gameState.selectedPiece.fromBox, rowName, rectIdx, 'a');
         }
 
         function handleInfZoneClick(zone) {
             if (!gameState.gameStarted || !gameState.selectedPiece) return;
-            if (gameState.gameMode === 'bot' && gameState.turn !== gameState.playerSide) return;
-            if (gameState.gameMode === 'online' && gameState.turn !== gameState.playerSide) return;
-
-            const sel = gameState.selectedPiece;
-            const targetRow = zone === 'K' ? 'K' : 'A';
-            if (isValidMove(sel.rowName, sel.rectIdx, sel.fromBox, targetRow, 0, sel.piece)) {
-                executeMove(sel.rowName, sel.rectIdx, sel.fromBox, targetRow, 0, 'center');
-            } else {
-                showStatus("Cannot move to infinity domain from here.");
-            }
+            executeMove(gameState.selectedPiece.rowName, gameState.selectedPiece.rectIdx, gameState.selectedPiece.fromBox, zone, 0, 'center');
         }
 
         function executeMove(fromRow, fromRect, fromBox, toRow, toRect, boxChoice) {
-            const fromKey = fromRow === 'K' || fromRow === 'A' ? `${fromRow}-0` : `${fromRow}-${fromRect}`;
-            const toKey = toRow === 'K' || toRow === 'A' ? `${toRow}-0` : `${toRow}-${toRect}`;
+            const fromKey = `${fromRow}-${fromRect}`;
+            const toKey = `${toRow}-${toRect}`;
             const fromRectObj = gameState.board[fromKey];
             const toRectObj = gameState.board[toKey];
 
-            let piece = null;
-            if (fromBox === 'center') {
-                piece = fromRectObj.centerPiece;
-                fromRectObj.centerPiece = null;
-            } else if (fromBox === 'a') {
-                piece = fromRectObj.aPiece;
-                fromRectObj.aPiece = null;
-            } else if (fromBox === 'b') {
-                piece = fromRectObj.bPiece;
-                fromRectObj.bPiece = null;
-            }
+            if (!fromRectObj || !toRectObj) return;
 
-            if ((piece.color === 'red' && toRow === 'K') || (piece.color === 'blue' && toRow === 'A')) {
-                piece.isInf = true;
-                piece.label = piece.color === 'red' ? '+∞' : '-∞';
-                if (piece.color === 'red') gameState.redScore += 10;
-                else gameState.blueScore += 10;
-                toRectObj.centerPiece = piece;
-                logNotation(gameState.turn, `Move ${gameState.logs.length + 1}: ${piece.label}-${toRow}`, "Infinity Domain Reached (+10 pts)");
-            } else if (toRow === 'K' || toRow === 'A') {
-                toRectObj.centerPiece = piece;
-            } else {
-                let logMsg = "";
-                const targetBoxKey = boxChoice === 'a' ? 'aPiece' : 'bPiece';
-                const oppBoxKey = boxChoice === 'a' ? 'bPiece' : 'aPiece';
+            let piece = fromBox === 'center' ? fromRectObj.centerPiece : (fromBox === 'a' ? fromRectObj.aPiece : fromRectObj.bPiece);
 
-                if (toRectObj[oppBoxKey]) {
-                    logMsg = resolveBinaryOp(toRectObj, piece, boxChoice);
-                } else {
-                    toRectObj[targetBoxKey] = piece;
-                    logMsg = `Moved to box (${boxChoice})`;
-                }
+            if (fromBox === 'center') fromRectObj.centerPiece = null;
+            else if (fromBox === 'a') fromRectObj.aPiece = null;
+            else if (fromBox === 'b') fromRectObj.bPiece = null;
 
-                const notation = `${piece.label}-${toRow}${toRect + 1}${boxChoice}`;
-                logNotation(gameState.turn, notation, logMsg);
-            }
+            if (boxChoice === 'a') toRectObj.aPiece = piece;
+            else if (boxChoice === 'b') toRectObj.bPiece = piece;
+            else toRectObj.centerPiece = piece;
 
             gameState.turn = gameState.turn === 'red' ? 'blue' : 'red';
             gameState.selectedPiece = null;
             renderBoard();
 
             if (gameState.gameMode === 'online') syncOnlineState();
-
-            if (gameState.gameStarted && !gameState.gamePaused && gameState.gameMode === 'bot' && gameState.turn !== gameState.playerSide) {
-                showStatus("Barista Bot thinking...");
-                setTimeout(runBotTurn, 500);
-            }
-        }
-
-        function resolveBinaryOp(rectObj, movingPiece, landingBox) {
-            const oppBox = landingBox === 'a' ? 'bPiece' : 'aPiece';
-            const oppPiece = rectObj[oppBox];
-
-            const aPiece = landingBox === 'a' ? movingPiece : oppPiece;
-            const bPiece = landingBox === 'a' ? oppPiece : movingPiece;
-
-            const aVal = parseVal(aPiece.val);
-            const bVal = parseVal(bPiece.val);
-            const op = rectObj.op;
-
-            let result = 0;
-            if (op === '+') result = aVal + bVal;
-            else if (op === '-') result = aVal - bVal;
-            else if (op === '×') result = aVal * bVal;
-            else if (op === '÷') result = bVal === 0 ? (aVal >= 0 ? Infinity : -Infinity) : aVal / bVal;
-
-            let resultType = 'neutral';
-            if (isNaN(result) || result === Infinity || result === -Infinity) {
-                if (result === Infinity || result === -Infinity) {
-                    movingPiece.isInf = true;
-                    movingPiece.label = result === Infinity ? '+∞' : '-∞';
-                    rectObj[landingBox === 'a' ? 'aPiece' : 'bPiece'] = movingPiece;
-                    rectObj[oppBox] = null;
-                    return `Infinity yielded! Converted to ${movingPiece.label}.`;
-                }
-                resultType = 'indeterminate';
-            } else if (result > 0) resultType = 'positive';
-            else if (result < 0) resultType = 'negative';
-            else resultType = 'zero';
-
-            if (resultType === 'positive') {
-                gameState.redScore += Math.abs(result);
-                const redPiece = aPiece.color === 'red' ? aPiece : bPiece;
-                rectObj[landingBox === 'a' ? 'aPiece' : 'bPiece'] = redPiece;
-                rectObj[oppBox] = null;
-            } else if (resultType === 'negative') {
-                gameState.blueScore += Math.abs(result);
-                const bluePiece = aPiece.color === 'blue' ? aPiece : bPiece;
-                rectObj[landingBox === 'a' ? 'aPiece' : 'bPiece'] = bluePiece;
-                rectObj[oppBox] = null;
-            } else {
-                rectObj.aPiece = null;
-                rectObj.bPiece = null;
-            }
-
-            return `Op: (${aPiece.label} ${op} ${bPiece.label}) = ${formatVal(result)} → ${resultType === 'positive' ? 'Red Stays' : resultType === 'negative' ? 'Blue Stays' : 'Both Eliminated'}`;
-        }
-
-        function runBotTurn() {
-            if (!gameState.gameStarted || gameState.turn === gameState.playerSide) return;
-
-            const botColor = gameState.turn;
-            let allMoves = [];
-            const allKeys = Object.keys(gameState.board);
-
-            allKeys.forEach(k => {
-                const rect = gameState.board[k];
-                if (!rect) return;
-
-                if (rect.centerPiece && rect.centerPiece.color === botColor) {
-                    collectValidMovesForPiece(rect.rowName, rect.rectIdx, 'center', rect.centerPiece, allMoves);
-                }
-                if (rect.aPiece && rect.aPiece.color === botColor) {
-                    collectValidMovesForPiece(rect.rowName, rect.rectIdx, 'a', rect.aPiece, allMoves);
-                }
-                if (rect.bPiece && rect.bPiece.color === botColor) {
-                    collectValidMovesForPiece(rect.rowName, rect.rectIdx, 'b', rect.bPiece, allMoves);
-                }
-            });
-
-            if (allMoves.length === 0) {
-                showStatus("Bot has no valid moves. Turn passed.");
-                gameState.turn = gameState.turn === 'red' ? 'blue' : 'red';
-                renderBoard();
-                return;
-            }
-
-            let chosenMove = allMoves[Math.floor(Math.random() * allMoves.length)];
-            if (chosenMove) {
-                executeMove(chosenMove.fromRow, chosenMove.fromRect, chosenMove.fromBox, chosenMove.toRow, chosenMove.toRect, chosenMove.boxChoice);
-            }
-        }
-
-        function collectValidMovesForPiece(fromRow, fromRect, fromBox, piece, moveList) {
-            const allKeys = Object.keys(gameState.board);
-            allKeys.forEach(k => {
-                const parts = k.split('-');
-                const toRow = parts[0];
-                const toRect = parseInt(parts[1]);
-                if (toRow === 'K' || toRow === 'A') {
-                    if (isValidMove(fromRow, fromRect, fromBox, toRow, toRect, piece)) {
-                        moveList.push({ fromRow, fromRect, fromBox, toRow, toRect, boxChoice: 'center' });
-                    }
-                } else {
-                    const destRect = gameState.board[k];
-                    if (!destRect) return;
-
-                    if (isValidMove(fromRow, fromRect, fromBox, toRow, toRect, piece)) {
-                        if (destRect.aPiece === null && (!destRect.bPiece || destRect.bPiece.color !== piece.color)) {
-                            moveList.push({ fromRow, fromRect, fromBox, toRow, toRect, boxChoice: 'a' });
-                        }
-                        if (destRect.bPiece === null && (!destRect.aPiece || destRect.aPiece.color !== piece.color)) {
-                            moveList.push({ fromRow, fromRect, fromBox, toRow, toRect, boxChoice: 'b' });
-                        }
-                    }
-                }
-            });
-        }
-
-        function logNotation(player, moveStr, detailStr) {
-            gameState.logs.push({ player, moveStr, detailStr });
-            const container = document.getElementById('notationLog');
-            if (container) {
-                container.innerHTML = gameState.logs.map(l => `
-                    <div class="theme-card p-1.5 rounded-lg border">
-                        <div class="${l.player === 'red' ? 'text-rose-600 font-black' : 'text-sky-600 font-black'}">${l.moveStr}</div>
-                        <div class="text-[var(--text-muted)] text-[9px] sm:text-[10px] mt-0.5">${l.detailStr}</div>
-                    </div>
-                `).join('');
-                container.scrollTop = container.scrollHeight;
-            }
         }
 
         function showStatus(msg) {
@@ -1445,41 +1055,16 @@
             if (el) el.innerText = msg;
         }
 
-        // DOM Event Listeners
         document.getElementById('configBtn').onclick = () => toggleModal('setupModal', true);
         document.getElementById('paletteBtn').onclick = () => toggleModal('paletteModal', true);
         document.getElementById('onlineBtn').onclick = () => toggleModal('onlineModal', true);
         document.getElementById('mechanicsBtn').onclick = () => toggleModal('mechanicsModal', true);
-        document.getElementById('notationBtn').onclick = () => toggleModal('notationModal', true);
 
         document.getElementById('startBtn').onclick = () => {
             gameState.gameStarted = true;
             gameState.gamePaused = false;
             startTimer();
             showStatus("Match started! Dark Roast (+) moves first.");
-        };
-
-        document.getElementById('pauseBtn').onclick = () => {
-            if (!gameState.gameStarted) return;
-            gameState.gamePaused = !gameState.gamePaused;
-            const pb = document.getElementById('pauseBtn');
-            pb.innerText = gameState.gamePaused ? 'Resume' : 'Pause';
-            showStatus(gameState.gamePaused ? "Match Paused." : "Match Resumed.");
-        };
-
-        document.getElementById('resetBtn').onclick = () => {
-            if (gameState.timerInterval) clearInterval(gameState.timerInterval);
-            gameState.gameStarted = false;
-            gameState.gamePaused = false;
-            gameState.turn = 'red';
-            gameState.redScore = 0;
-            gameState.blueScore = 0;
-            gameState.redTime = 15 * 60;
-            gameState.blueTime = 15 * 60;
-            gameState.logs = [];
-            initBoard();
-            renderBoard();
-            showStatus("Table reset. Click Start to begin.");
         };
 
         function toggleModal(modalId, show) {
@@ -1491,7 +1076,6 @@
             initBoard();
             renderBoard();
             setTimeout(autoScaleBoard, 100);
-            setTimeout(autoScaleBoard, 400);
         };
     </script>
 </body>
