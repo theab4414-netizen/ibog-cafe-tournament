@@ -288,14 +288,14 @@
                 <div id="boardScaler" class="flex flex-col items-center justify-center transition-transform origin-center gap-1">
                     
                     <div class="w-full flex flex-col items-center justify-center gap-0.5 px-3 py-1 text-[11px] sm:text-xs font-mono font-bold text-[var(--text-main)] bg-[var(--bg-subcard)] rounded-xl border-2 border-[var(--border-card)] shadow-sm text-center">
-                        <div>k/0 = ±∞ | k/∞ = 0 | 0/k = 0 | 0/∞ = 0 | ∞/0 = ±∞</div>
+                        <div>k/0 = ±∞ | k/±∞ = 0 | 0/k = 0 | 0/±∞ = 0 | ±∞/0 = ±∞</div>
                         <div class="text-[var(--accent-primary)] text-[10px] sm:text-[11px]">∞ - ∞ = indeterminate | ∞/∞ = indeterminate | 0*(∞) = indeterminate</div>
                     </div>
 
                     <div id="ibogBoard" class="flex flex-col gap-0.5 w-max items-center py-0.5"></div>
 
                     <div class="w-full flex flex-col items-center justify-center gap-0.5 px-3 py-1 text-[11px] sm:text-xs font-mono font-bold text-[var(--text-main)] bg-[var(--bg-subcard)] rounded-xl border-2 border-[var(--border-card)] shadow-sm text-center">
-                        <div>k/0 = ±∞ | k/∞ = 0 | 0/k = 0 | 0/∞ = 0 | ∞/0 = ±∞</div>
+                        <div>k/0 = ±∞ | k/±∞ = 0 | 0/k = 0 | 0/±∞ = 0 | ±∞/0 = ±∞</div>
                         <div class="text-[var(--accent-primary)] text-[10px] sm:text-[11px]">∞ - ∞ = indeterminate | ∞/∞ = indeterminate | 0*(∞) = indeterminate</div>
                     </div>
 
@@ -451,7 +451,15 @@
                 <p><strong>4. Rectangle Color Rule (Boxes a & b):</strong> A single rectangle cannot contain two pieces of the same color across boxes 'a' and 'b'. Once one box is occupied, the other is off-limits to pieces of that same color.</p>
                 <p><strong>5. Arrow Restriction Rule:</strong> Pieces starting from their initial center positions are strictly forbidden from moving directly into their specific target restriction rectangles on Row E (for red pieces) or Rows G, H, I (for blue pieces).</p>
                 <p><strong>6. Infinity Pieces:</strong> Reaching infinity zones (+∞ ROAST DOMAIN or -∞ COLD DOMAIN) or yielding infinity converts a piece to ∞, allowing rook-like unobstructed movement across rows and columns.</p>
-                <p><strong>7. Binary Operations:</strong> When opposing pieces meet in a rectangle (one in 'a', one in 'b'), a binary operation is triggered. Positive results credit Dark Roast (+) and keep the red piece while eliminating the blue piece. Negative results credit Cold Brew (-) and keep the blue piece while eliminating the red piece. Zero or indeterminate results eliminate both pieces.</p>
+                <p><strong>7. Binary Operations Rules:</strong></p>
+                <ul class="list-disc pl-5 space-y-1 text-[10px] sm:text-[11px]">
+                    <li><strong>k / 0 = ±∞:</strong> The resulting infinity piece retains the owner color and sign of the constant (k). (e.g., Red piece constant $k \div 0 \Rightarrow$ Red piece $\pm\infty$).</li>
+                    <li><strong>k / ±∞ = 0:</strong> Dividing any constant $k$ by infinity results in $0$.</li>
+                    <li><strong>0 / k = 0:</strong> Dividing $0$ by any non-zero constant $k$ results in $0$.</li>
+                    <li><strong>0 / ±∞ = 0:</strong> Dividing $0$ by infinity results in $0$.</li>
+                    <li><strong>±∞ / 0 = ±∞:</strong> Infinity divided by $0$ yields infinity with the owner color and sign of the numerator infinity.</li>
+                    <li><strong>Indeterminate Formats:</strong> $(\infty - \infty)$, $(\infty / \infty)$, and $(0 \times \infty)$ yield indeterminate result and eliminate both pieces.</li>
+                </ul>
                 <p><strong>8. Time Control:</strong> Each player is given 15 minutes. Running out of time deducts 25 points.</p>
             </div>
         </div>
@@ -1148,8 +1156,8 @@
         }
 
         function parseVal(str) {
-            if (str === '+inf' || str === 'inf' || str === 'INF+') return Infinity;
-            if (str === '-inf' || str === 'INF-') return -Infinity;
+            if (str === '+inf' || str === 'inf' || str === 'INF+' || str === '+∞' || str === '∞') return Infinity;
+            if (str === '-inf' || str === 'INF-' || str === '-∞') return -Infinity;
             if (str.includes('/')) {
                 const parts = str.split('/');
                 return parseFloat(parts[0]) / parseFloat(parts[1]);
@@ -1570,54 +1578,133 @@
             }
         }
 
-        // --- UPDATED BINARY OPERATION RULE LOGIC ---
-        // Positive result: Score -> Red (+), Red piece stays, Blue piece eliminated
-        // Negative result: Score -> Blue (-), Blue piece stays, Red piece eliminated
-        // Zero or Indeterminate: Both pieces eliminated
+        // --- SPECIFIC MATHEMATICAL BINARY OPERATOR RULE IMPLEMENTATION ---
+        // Rule 1: k / 0 = ±∞ (infinity carries constant k's owner color and sign)
+        // Rule 2: k / ±∞ = 0
+        // Rule 3: 0 / k = 0
+        // Rule 4: 0 / ±∞ = 0
+        // Rule 5: ±∞ / 0 = ±∞ (infinity carries numerator infinity's owner color and sign)
+        // Rule 6: ∞ - ∞ = Indeterminate (both eliminated)
+        // Rule 7: ∞ / ∞ = Indeterminate (both eliminated)
+        // Rule 8: 0 * ∞ = Indeterminate (both eliminated)
+        function evalBinary(aPiece, bPiece, op) {
+            const aVal = parseVal(aPiece.val);
+            const bVal = parseVal(bPiece.val);
+
+            const isAInf = aPiece.isInf || Math.abs(aVal) === Infinity;
+            const isBInf = bPiece.isInf || Math.abs(bVal) === Infinity;
+
+            // Indeterminate Rules
+            if (op === '-' && isAInf && isBInf) return { isIndet: true };
+            if (op === '÷' && isAInf && isBInf) return { isIndet: true };
+            if (op === '×' && ((aVal === 0 && isBInf) || (bVal === 0 && isAInf))) return { isIndet: true };
+
+            if (op === '+') {
+                if (isAInf && isBInf) {
+                    if ((aVal > 0 && bVal > 0) || (aVal < 0 && bVal < 0)) {
+                        return { val: aVal, ownerColor: aPiece.color, isInf: true };
+                    }
+                    return { isIndet: true };
+                }
+                if (isAInf) return { val: aVal, ownerColor: aPiece.color, isInf: true };
+                if (isBInf) return { val: bVal, ownerColor: bPiece.color, isInf: true };
+                return { val: aVal + bVal };
+            }
+
+            if (op === '-') {
+                if (isAInf) return { val: aVal, ownerColor: aPiece.color, isInf: true };
+                if (isBInf) return { val: -bVal, ownerColor: bPiece.color, isInf: true };
+                return { val: aVal - bVal };
+            }
+
+            if (op === '×') {
+                if (isAInf || isBInf) {
+                    const resultSign = (aVal >= 0 ? 1 : -1) * (bVal >= 0 ? 1 : -1);
+                    const owner = isAInf ? aPiece.color : bPiece.color;
+                    return { val: resultSign * Infinity, ownerColor: owner, isInf: true };
+                }
+                return { val: aVal * bVal };
+            }
+
+            if (op === '÷') {
+                // k / 0 = ±∞ (sign & owner derived from constant k numerator)
+                if (bVal === 0) {
+                    if (isAInf) {
+                        // ±∞ / 0 = ±∞ (sign & owner from numerator infinity)
+                        return { val: aVal, ownerColor: aPiece.color, isInf: true };
+                    }
+                    if (aVal === 0) return { isIndet: true }; // 0/0
+                    // Constant k / 0 = ±∞
+                    const infSign = aVal >= 0 ? Infinity : -Infinity;
+                    return { val: infSign, ownerColor: aPiece.color, isInf: true };
+                }
+
+                // k / ±∞ = 0
+                if (isBInf) return { val: 0 };
+
+                // 0 / k = 0
+                if (aVal === 0) return { val: 0 };
+
+                if (isAInf) {
+                    const resultSign = (aVal >= 0 ? 1 : -1) * (bVal >= 0 ? 1 : -1);
+                    return { val: resultSign * Infinity, ownerColor: aPiece.color, isInf: true };
+                }
+
+                return { val: aVal / bVal };
+            }
+
+            return { val: 0 };
+        }
+
         function resolveBinaryOp(rectObj, movingPiece, landingBox) {
             const oppBox = landingBox === 'a' ? 'bPiece' : 'aPiece';
             const oppPiece = rectObj[oppBox];
-            
-            // Identify which piece is Red (+) and Blue (-)
-            const redPiece = movingPiece.color === 'red' ? movingPiece : oppPiece;
-            const bluePiece = movingPiece.color === 'blue' ? movingPiece : oppPiece;
-            const redBoxKey = movingPiece.color === 'red' ? (landingBox === 'a' ? 'aPiece' : 'bPiece') : (landingBox === 'a' ? 'bPiece' : 'aPiece');
-            const blueBoxKey = movingPiece.color === 'blue' ? (landingBox === 'a' ? 'aPiece' : 'bPiece') : (landingBox === 'a' ? 'bPiece' : 'aPiece');
 
-            const aVal = parseVal(landingBox === 'a' ? movingPiece.val : oppPiece.val);
-            const bVal = parseVal(landingBox === 'a' ? oppPiece.val : movingPiece.val);
-            const op = rectObj.op;
+            const aPiece = landingBox === 'a' ? movingPiece : oppPiece;
+            const bPiece = landingBox === 'a' ? oppPiece : movingPiece;
 
-            let result = evalBinary(aVal, bVal, op);
+            const opResult = evalBinary(aPiece, bPiece, rectObj.op);
 
-            if (isNaN(result) || result === 0) {
+            if (opResult.isIndet || opResult.val === 0) {
                 // Indeterminate or Zero -> Both pieces eliminated
                 rectObj.aPiece = null;
                 rectObj.bPiece = null;
-                return `Op result (${formatVal(result)}): Both pieces eliminated.`;
+                return `Op result (${opResult.isIndet ? 'Indeterminate' : '0'}): Both pieces eliminated.`;
             }
 
-            if (result > 0) {
-                // Positive result -> Dark Roast (+) scores points, Red piece stays, Blue piece eliminated
-                gameState.redScore += Math.abs(result);
-                rectObj[redBoxKey] = redPiece;
-                rectObj[blueBoxKey] = null;
-                return `Op result (+${formatVal(result)}): Dark Roast (+) scores! Red stays, Blue eliminated.`;
+            let winnerPiece = null;
+            let winnerColor = '';
+            let val = opResult.val;
+
+            if (opResult.isInf) {
+                winnerColor = opResult.ownerColor;
+                winnerPiece = winnerColor === movingPiece.color ? movingPiece : oppPiece;
+                winnerPiece.isInf = true;
+                winnerPiece.val = val > 0 ? '+inf' : '-inf';
+                winnerPiece.label = val > 0 ? '+∞' : '-∞';
+            } else if (val > 0) {
+                winnerColor = 'red';
+                winnerPiece = movingPiece.color === 'red' ? movingPiece : oppPiece;
+                gameState.redScore += Math.abs(val);
             } else {
-                // Negative result -> Cold Brew (-) scores points, Blue piece stays, Red piece eliminated
-                gameState.blueScore += Math.abs(result);
-                rectObj[blueBoxKey] = bluePiece;
-                rectObj[redBoxKey] = null;
-                return `Op result (${formatVal(result)}): Cold Brew (-) scores! Blue stays, Red eliminated.`;
+                winnerColor = 'blue';
+                winnerPiece = movingPiece.color === 'blue' ? movingPiece : oppPiece;
+                gameState.blueScore += Math.abs(val);
             }
-        }
 
-        function evalBinary(a, b, op) {
-            if (op === '+') return a + b;
-            if (op === '-') return a - b;
-            if (op === '×') return a * b;
-            if (op === '÷') return b === 0 ? (a >= 0 ? Infinity : -Infinity) : a / b;
-            return 0;
+            const landingBoxKey = landingBox === 'a' ? 'aPiece' : 'bPiece';
+            const defendingBoxKey = landingBox === 'a' ? 'bPiece' : 'aPiece';
+
+            if (winnerPiece.color === movingPiece.color) {
+                rectObj[landingBoxKey] = winnerPiece;
+                rectObj[defendingBoxKey] = null;
+            } else {
+                rectObj[defendingBoxKey] = winnerPiece;
+                rectObj[landingBoxKey] = null;
+            }
+
+            const sideText = winnerColor === 'red' ? 'Dark Roast (+)' : 'Cold Brew (-)';
+            return `Op result (${formatVal(val)}): ${sideText} wins piece & score!`;
         }
 
         function makeBotMove() {
