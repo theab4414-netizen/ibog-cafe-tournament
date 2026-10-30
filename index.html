@@ -168,8 +168,8 @@
             display: flex !important;
             flex-direction: column !important;
             height: auto !important;
-            padding: 4px !important;
-            gap: 6px !important;
+            padding: 6px !important;
+            gap: 10px !important;
             overflow: visible !important;
         }
 
@@ -189,22 +189,17 @@
             font-size: 9px !important;
         }
 
+        /* Mobile Phone View Side Panel lower portion layout matching reference photo */
         body.is-phone-view .w-full.xl\:w-72 {
             width: 100% !important;
-            flex-direction: row !important;
-            gap: 6px !important;
+            flex-direction: column !important;
+            gap: 10px !important;
         }
 
         body.is-phone-view #boardViewport {
             padding: 2px !important;
             overflow: auto !important;
             -webkit-overflow-scrolling: touch;
-        }
-
-        body.is-phone-view .font-mono.text-\[11px\],
-        body.is-phone-view .font-mono.text-xs {
-            font-size: 9px !important;
-            padding: 2px 4px !important;
         }
 
         .font-board { font-family: 'Fredoka', sans-serif; }
@@ -326,45 +321,45 @@
 
         <div class="w-full xl:w-72 flex flex-row xl:flex-col gap-2 shrink-0 h-auto xl:h-full overflow-hidden">
             
-            <div class="theme-card border rounded-2xl p-2 shadow-sm flex flex-col justify-center gap-1.5 flex-1 xl:flex-none">
-                <h3 class="font-bold text-[11px] uppercase tracking-wider text-[var(--text-main)] border-b border-[var(--border-card)] pb-1 flex items-center justify-between">
+            <div class="theme-card border rounded-2xl p-3 sm:p-3.5 shadow-sm flex flex-col justify-center gap-2 flex-1 xl:flex-none">
+                <h3 class="font-bold text-[11px] sm:text-xs uppercase tracking-wider text-[var(--text-main)] pb-1 flex items-center justify-between border-b border-[var(--border-card)]">
                     <span>CLOCKS & AROMA POINTS</span>
                     <span>⏱️</span>
                 </h3>
                 
-                <div class="grid grid-cols-2 xl:grid-cols-1 gap-1.5">
-                    <div class="theme-subcard border p-1.5 rounded-xl flex justify-between items-center">
-                        <div>
-                            <div class="text-[9px] text-rose-600 font-extrabold uppercase tracking-wide">DARK ROAST (+)</div>
-                            <div class="text-[10px] text-[var(--text-main)]">Score: <span id="redScore" class="font-black text-rose-600 text-xs">0</span></div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div class="theme-subcard border p-2.5 rounded-xl flex flex-col justify-between">
+                        <div class="text-[9px] text-rose-600 font-extrabold uppercase tracking-wide truncate">DARK ROAST (+)</div>
+                        <div class="flex items-baseline justify-between mt-1">
+                            <div class="text-[10px] text-[var(--text-main)]">Score: <span id="redScore" class="font-black text-rose-600 text-xs sm:text-sm">0</span></div>
                         </div>
-                        <div class="text-right">
-                            <div class="text-[8px] text-[var(--text-muted)] font-bold uppercase">TIMER</div>
-                            <div id="redTimer" class="font-mono text-xs sm:text-sm font-black text-[var(--text-main)]">15:00</div>
+                        <div class="mt-2 pt-1 border-t border-[var(--border-card)] flex justify-between items-center">
+                            <span class="text-[8px] text-[var(--text-muted)] font-bold uppercase">TIMER</span>
+                            <span id="redTimer" class="font-mono text-xs sm:text-sm font-black text-[var(--text-main)]">15:00</span>
                         </div>
                     </div>
 
-                    <div class="theme-subcard border p-1.5 rounded-xl flex justify-between items-center">
-                        <div>
-                            <div class="text-[9px] text-sky-600 font-extrabold uppercase tracking-wide">COLD BREW (-)</div>
-                            <div class="text-[10px] text-[var(--text-main)]">Score: <span id="blueScore" class="font-black text-sky-600 text-xs">0</span></div>
+                    <div class="theme-subcard border p-2.5 rounded-xl flex flex-col justify-between">
+                        <div class="text-[9px] text-sky-600 font-extrabold uppercase tracking-wide truncate">COLD BREW (-)</div>
+                        <div class="flex items-baseline justify-between mt-1">
+                            <div class="text-[10px] text-[var(--text-main)]">Score: <span id="blueScore" class="font-black text-sky-600 text-xs sm:text-sm">0</span></div>
                         </div>
-                        <div class="text-right">
-                            <div class="text-[8px] text-[var(--text-muted)] font-bold uppercase">TIMER</div>
-                            <div id="blueTimer" class="font-mono text-xs sm:text-sm font-black text-[var(--text-main)]">15:00</div>
+                        <div class="mt-2 pt-1 border-t border-[var(--border-card)] flex justify-between items-center">
+                            <span class="text-[8px] text-[var(--text-muted)] font-bold uppercase">TIMER</span>
+                            <span id="blueTimer" class="font-mono text-xs sm:text-sm font-black text-[var(--text-main)]">15:00</span>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="theme-card border rounded-2xl p-2 shadow-sm flex flex-col flex-1 min-h-[120px] xl:min-h-0 overflow-hidden">
-                <div class="flex justify-between items-center mb-1 pb-1 border-b border-[var(--border-card)] shrink-0">
-                    <h3 class="font-bold text-[11px] text-[var(--text-main)] uppercase tracking-wider flex items-center gap-1">
+            <div class="theme-card border rounded-2xl p-3 sm:p-3.5 shadow-sm flex flex-col flex-1 min-h-[140px] xl:min-h-0 overflow-hidden">
+                <div class="flex justify-between items-center mb-1.5 pb-1 border-b border-[var(--border-card)] shrink-0">
+                    <h3 class="font-bold text-[11px] sm:text-xs text-[var(--text-main)] uppercase tracking-wider flex items-center gap-1">
                         <span>☕ RECIPE LEDGER</span>
                     </h3>
                     <span class="text-[9px] font-bold text-[var(--text-muted)]" id="moveCount">Brewed: 0</span>
                 </div>
-                <div class="flex-1 theme-subcard rounded-xl p-1.5 overflow-y-auto border border-[var(--border-card)] space-y-1 font-mono text-[10px]" id="notationLog">
+                <div class="flex-1 theme-subcard rounded-xl p-2 overflow-y-auto border border-[var(--border-card)] space-y-1.5 font-mono text-[10px]" id="notationLog">
                     <div class="text-[var(--text-muted)] italic text-center py-4 text-[10px]">Brewing logs populate here...</div>
                 </div>
             </div>
@@ -1516,9 +1511,9 @@
             const container = document.getElementById('notationLog');
             if (container) {
                 container.innerHTML = gameState.logs.map(l => `
-                    <div class="theme-card p-1 rounded-lg border text-[10px]">
-                        <div class="${l.player === 'red' ? 'text-rose-600 font-black' : 'text-sky-600 font-black'}">${l.moveStr}</div>
-                        <div class="text-[var(--text-muted)] text-[9px] mt-0.5 leading-tight">${l.detailStr}</div>
+                    <div class="theme-card p-2 rounded-xl border space-y-1">
+                        <div class="${l.player === 'red' ? 'text-rose-600 font-black' : 'text-sky-600 font-black'} text-xs">${l.moveStr}</div>
+                        <div class="text-[var(--text-muted)] text-[10px] leading-tight">${l.detailStr}</div>
                     </div>
                 `).join('');
                 container.scrollTop = container.scrollHeight;
@@ -1552,3 +1547,4 @@
     </script>
 </body>
 </html>
+```[file-tag: code-generated-file-ibog58]
