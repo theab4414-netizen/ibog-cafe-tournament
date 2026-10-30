@@ -451,7 +451,7 @@
                 <p><strong>4. Rectangle Color Rule (Boxes a & b):</strong> A single rectangle cannot contain two pieces of the same color across boxes 'a' and 'b'. Once one box is occupied, the other is off-limits to pieces of that same color.</p>
                 <p><strong>5. Arrow Restriction Rule:</strong> Pieces starting from their initial center positions are strictly forbidden from moving directly into their specific target restriction rectangles on Row E (for red pieces) or Rows G, H, I (for blue pieces).</p>
                 <p><strong>6. Infinity Pieces:</strong> Reaching infinity zones (+∞ ROAST DOMAIN or -∞ COLD DOMAIN) or yielding infinity converts a piece to ∞, allowing rook-like unobstructed movement across rows and columns.</p>
-                <p><strong>7. Binary Operations:</strong> When opposing pieces meet in a rectangle (one in 'a', one in 'b'), a binary operation is triggered. Positive results credit Dark Roast, negative credit Cold Brew. Zero or indeterminate results eliminate both pieces.</p>
+                <p><strong>7. Binary Operations:</strong> When opposing pieces meet in a rectangle (one in 'a', one in 'b'), a binary operation is triggered. Positive results credit Dark Roast (+) and keep the red piece while eliminating the blue piece. Negative results credit Cold Brew (-) and keep the blue piece while eliminating the red piece. Zero or indeterminate results eliminate both pieces.</p>
                 <p><strong>8. Time Control:</strong> Each player is given 15 minutes. Running out of time deducts 25 points.</p>
             </div>
         </div>
@@ -1570,29 +1570,46 @@
             }
         }
 
+        // --- UPDATED BINARY OPERATION RULE LOGIC ---
+        // Positive result: Score -> Red (+), Red piece stays, Blue piece eliminated
+        // Negative result: Score -> Blue (-), Blue piece stays, Red piece eliminated
+        // Zero or Indeterminate: Both pieces eliminated
         function resolveBinaryOp(rectObj, movingPiece, landingBox) {
             const oppBox = landingBox === 'a' ? 'bPiece' : 'aPiece';
             const oppPiece = rectObj[oppBox];
+            
+            // Identify which piece is Red (+) and Blue (-)
+            const redPiece = movingPiece.color === 'red' ? movingPiece : oppPiece;
+            const bluePiece = movingPiece.color === 'blue' ? movingPiece : oppPiece;
+            const redBoxKey = movingPiece.color === 'red' ? (landingBox === 'a' ? 'aPiece' : 'bPiece') : (landingBox === 'a' ? 'bPiece' : 'aPiece');
+            const blueBoxKey = movingPiece.color === 'blue' ? (landingBox === 'a' ? 'aPiece' : 'bPiece') : (landingBox === 'a' ? 'bPiece' : 'aPiece');
+
             const aVal = parseVal(landingBox === 'a' ? movingPiece.val : oppPiece.val);
             const bVal = parseVal(landingBox === 'a' ? oppPiece.val : movingPiece.val);
             const op = rectObj.op;
 
             let result = evalBinary(aVal, bVal, op);
-            const landingBoxKey = landingBox === 'a' ? 'aPiece' : 'bPiece';
-            const defendingBoxKey = landingBox === 'a' ? 'bPiece' : 'aPiece';
 
-            if (isNaN(result)) {
+            if (isNaN(result) || result === 0) {
+                // Indeterminate or Zero -> Both pieces eliminated
                 rectObj.aPiece = null;
                 rectObj.bPiece = null;
-                return `Op: Indeterminate → Eliminated.`;
+                return `Op result (${formatVal(result)}): Both pieces eliminated.`;
             }
 
-            if (result > 0) gameState.redScore += Math.abs(result);
-            else if (result < 0) gameState.blueScore += Math.abs(result);
-
-            rectObj[landingBoxKey] = movingPiece;
-            rectObj[defendingBoxKey] = null;
-            return `Op result: ${formatVal(result)}`;
+            if (result > 0) {
+                // Positive result -> Dark Roast (+) scores points, Red piece stays, Blue piece eliminated
+                gameState.redScore += Math.abs(result);
+                rectObj[redBoxKey] = redPiece;
+                rectObj[blueBoxKey] = null;
+                return `Op result (+${formatVal(result)}): Dark Roast (+) scores! Red stays, Blue eliminated.`;
+            } else {
+                // Negative result -> Cold Brew (-) scores points, Blue piece stays, Red piece eliminated
+                gameState.blueScore += Math.abs(result);
+                rectObj[blueBoxKey] = bluePiece;
+                rectObj[redBoxKey] = null;
+                return `Op result (${formatVal(result)}): Cold Brew (-) scores! Blue stays, Red eliminated.`;
+            }
         }
 
         function evalBinary(a, b, op) {
