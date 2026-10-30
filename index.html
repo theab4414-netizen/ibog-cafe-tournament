@@ -163,6 +163,20 @@
             scrollbar-width: thin !important;
         }
 
+        /* Standard Desktop Dimensions */
+        .ibog-rect {
+            width: 3.0cm;
+            height: 1.4cm;
+        }
+        .ibog-box {
+            width: 0.85cm;
+            height: 1.1cm;
+        }
+        .ibog-domain {
+            width: 3.0cm;
+            height: 1.4cm;
+        }
+
         /* Mobile Phone View Specific Adaptive Adjustments */
         body.is-phone-view main {
             display: flex !important;
@@ -177,7 +191,6 @@
             font-size: 11px !important;
         }
 
-        /* Compact Clocks & Aroma points card on mobile */
         body.is-phone-view #clocksCard {
             padding: 8px !important;
             gap: 6px !important;
@@ -189,18 +202,19 @@
 
         /* Scaled down board dimensions for phone view */
         body.is-phone-view .ibog-rect {
-            width: 2.3cm !important;
-            height: 1.15cm !important;
+            width: 2.1cm !important;
+            height: 1.05cm !important;
         }
 
         body.is-phone-view .ibog-box {
-            width: 0.68cm !important;
-            height: 0.95cm !important;
+            width: 0.62cm !important;
+            height: 0.85cm !important;
+            font-size: 10px !important;
         }
 
         body.is-phone-view .ibog-domain {
-            width: 2.3cm !important;
-            height: 1.15cm !important;
+            width: 2.1cm !important;
+            height: 1.05cm !important;
             font-size: 9px !important;
         }
 
@@ -1133,7 +1147,7 @@
             rK.className = "flex justify-center w-full";
             const kPiece = gameState.board['K-0'].centerPiece;
             rK.innerHTML = `
-                <div class="ibog-domain bg-rose-700 text-white border-2 border-rose-800 font-black px-1 py-0.5 rounded-xl text-center shadow-md cursor-pointer transition text-xs tracking-wider flex items-center justify-center gap-1.5 shrink-0" style="width: 3.0cm; height: 1.4cm;" onclick="handleInfZoneClick('K')">
+                <div class="ibog-domain bg-rose-700 text-white border-2 border-rose-800 font-black px-1 py-0.5 rounded-xl text-center shadow-md cursor-pointer transition text-xs tracking-wider flex items-center justify-center gap-1.5 shrink-0" onclick="handleInfZoneClick('K')">
                     <span class="font-black text-[10px] leading-tight flex-1 text-center">+∞ ROAST DOMAIN</span>
                     ${kPiece ? `<span class="bg-white text-rose-700 font-board px-1.5 py-0.5 rounded-lg text-xs font-black shadow cursor-pointer border border-rose-300 shrink-0" onclick="event.stopPropagation(); handlePieceSelect('K', 0, 'center')">${kPiece.label}</span>` : ''}
                 </div>
@@ -1157,7 +1171,7 @@
 
                     const rectEl = document.createElement('div');
                     let bgStyle = isGreen ? 'background-color: var(--tile-dark-bg); border-color: var(--tile-dark-border);' : 'background-color: var(--tile-light-bg); border-color: var(--tile-light-border);';
-                    rectEl.style.cssText = `width: 3.0cm; height: 1.4cm; ${bgStyle}`;
+                    rectEl.style.cssText = bgStyle;
                     rectEl.className = `ibog-rect rounded-xl border-2 flex items-center justify-between px-1 py-0.5 relative shadow-sm transition transform shrink-0 ${isSelected ? 'highlight-rect ring-4 ring-amber-400 z-10 scale-[1.02]' : ''}`;
 
                     const boxAEl = document.createElement('div');
@@ -1165,15 +1179,11 @@
                     const isPieceASelected = isSelected && gameState.selectedPiece.fromBox === 'a';
                     let boxABg = hasAPiece ? (rect.aPiece.color === 'red' ? 'bg-rose-600 text-white shadow' : 'bg-sky-600 text-white shadow') : (isGreen ? 'bg-[#006850]/20 text-[var(--text-main)] border border-[var(--tile-dark-border)]' : 'bg-white/60 text-[var(--text-main)] border border-[var(--tile-light-border)]');
                     
-                    boxAEl.style.width = '0.85cm';
-                    boxAEl.style.height = '1.1cm';
                     boxAEl.className = `ibog-box rounded-lg flex items-center justify-center font-board text-xs font-bold cursor-pointer transition shrink-0 ${boxABg} ${isPieceASelected ? 'ring-2 ring-amber-300 ring-offset-1 scale-105' : ''}`;
                     boxAEl.innerText = hasAPiece ? rect.aPiece.label : 'a';
                     boxAEl.onclick = (e) => { e.stopPropagation(); if (hasAPiece) handlePieceSelect(rowName, c, 'a'); else handleBoxClick(rowName, c, 'a'); };
 
                     const centerEl = document.createElement('div');
-                    centerEl.style.width = '0.85cm';
-                    centerEl.style.height = '1.1cm';
                     centerEl.className = "ibog-box flex flex-col items-center justify-center cursor-pointer mx-auto shrink-0";
                     
                     if (rect.centerPiece) {
@@ -1193,8 +1203,6 @@
                     const isPieceBSelected = isSelected && gameState.selectedPiece.fromBox === 'b';
                     let boxBBg = hasBPiece ? (rect.bPiece.color === 'red' ? 'bg-rose-600 text-white shadow' : 'bg-sky-600 text-white shadow') : (isGreen ? 'bg-[#006850]/20 text-[var(--text-main)] border border-[var(--tile-dark-border)]' : 'bg-white/60 text-[var(--text-main)] border border-[var(--tile-light-border)]');
                     
-                    boxBEl.style.width = '0.85cm';
-                    boxBEl.style.height = '1.1cm';
                     boxBEl.className = `ibog-box rounded-lg flex items-center justify-center font-board text-xs font-bold cursor-pointer transition shrink-0 ${boxBBg} ${isPieceBSelected ? 'ring-2 ring-amber-300 ring-offset-1 scale-105' : ''}`;
                     boxBEl.innerText = hasBPiece ? rect.bPiece.label : 'b';
                     boxBEl.onclick = (e) => { e.stopPropagation(); if (hasBPiece) handlePieceSelect(rowName, c, 'b'); else handleBoxClick(rowName, c, 'b'); };
@@ -1212,7 +1220,7 @@
             rA.className = "flex justify-center w-full";
             const aPiece = gameState.board['A-0'].centerPiece;
             rA.innerHTML = `
-                <div class="ibog-domain bg-sky-700 text-white border-2 border-sky-800 font-black px-1 py-0.5 rounded-xl text-center shadow-md cursor-pointer transition text-xs tracking-wider flex items-center justify-center gap-1.5 shrink-0" style="width: 3.0cm; height: 1.4cm;" onclick="handleInfZoneClick('A')">
+                <div class="ibog-domain bg-sky-700 text-white border-2 border-sky-800 font-black px-1 py-0.5 rounded-xl text-center shadow-md cursor-pointer transition text-xs tracking-wider flex items-center justify-center gap-1.5 shrink-0" onclick="handleInfZoneClick('A')">
                     <span class="font-black text-[10px] leading-tight flex-1 text-center">-∞ COLD DOMAIN</span>
                     ${aPiece ? `<span class="bg-white text-sky-700 font-board px-1.5 py-0.5 rounded-lg text-xs font-black shadow cursor-pointer border border-sky-300 shrink-0" onclick="event.stopPropagation(); handlePieceSelect('A', 0, 'center')">${aPiece.label}</span>` : ''}
                 </div>
