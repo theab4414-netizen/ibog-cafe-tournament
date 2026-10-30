@@ -122,7 +122,6 @@
             user-select: none;
         }
 
-        /* Allow pinch-to-zoom and touch gestures exclusively on mobile phone views */
         body.is-phone-view {
             overflow: auto !important;
             touch-action: pan-x pan-y pinch-zoom !important;
@@ -163,7 +162,6 @@
             scrollbar-width: thin !important;
         }
 
-        /* Mobile Phone View Specific Adaptive Adjustments (DOES NOT AFFECT PC VIEW) */
         body.is-phone-view main {
             display: flex !important;
             flex-direction: column !important;
@@ -189,7 +187,6 @@
             font-size: 9px !important;
         }
 
-        /* Mobile Phone View Side Panel lower portion layout matching reference photo */
         body.is-phone-view .w-full.xl\:w-72 {
             width: 100% !important;
             flex-direction: column !important;
@@ -250,8 +247,8 @@
                 <span class="hidden xs:inline">Next</span><span>↪</span>
             </button>
 
-            <button id="readyBtn" class="bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] sm:text-xs font-bold px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg transition shadow-sm shrink-0">Ready</button>
-            <button id="pauseBtn" class="bg-amber-700 hover:bg-amber-800 text-white text-[10px] sm:text-xs font-bold px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg transition shadow-sm shrink-0">Pause</button>
+            <button id="readyBtn" onclick="requestReady()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] sm:text-xs font-bold px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg transition shadow-sm shrink-0">Ready</button>
+            <button id="pauseBtn" onclick="requestPause()" class="bg-amber-700 hover:bg-amber-800 text-white text-[10px] sm:text-xs font-bold px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg transition shadow-sm shrink-0">Pause</button>
             
             <button id="configBtn" class="theme-btn-accent text-[10px] sm:text-xs font-bold px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg transition shadow-sm flex items-center gap-0.5 shrink-0">
                 <span>⚙️</span> <span class="hidden xs:inline">Setup</span>
@@ -262,7 +259,7 @@
             <button id="onlineBtn" class="bg-purple-700 hover:bg-purple-800 text-white text-[10px] sm:text-xs font-bold px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg transition shadow-sm shrink-0">Online</button>
             <button id="mechanicsBtn" class="theme-subcard hover:opacity-80 text-[10px] sm:text-xs font-semibold px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg transition border text-[var(--text-main)] shrink-0">Rules</button>
             <button id="notationBtn" class="theme-subcard hover:opacity-80 text-[10px] sm:text-xs font-semibold px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg transition border text-[var(--text-main)] shrink-0 hidden md:inline-block">Notations</button>
-            <button id="resetBtn" class="theme-subcard hover:opacity-80 text-[10px] sm:text-xs font-semibold px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg transition border text-[var(--text-main)] shrink-0">Reset</button>
+            <button id="resetBtn" onclick="requestReset()" class="theme-subcard hover:opacity-80 text-[10px] sm:text-xs font-semibold px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg transition border text-[var(--text-main)] shrink-0">Reset</button>
         </div>
     </header>
 
@@ -283,7 +280,7 @@
                     </div>
                 </div>
                 <div class="flex justify-end items-center shrink-0">
-                    <button id="redDrawBtn" onclick="requestDraw('red')" class="bg-rose-100 border border-rose-300 text-rose-800 hover:bg-rose-200 text-[9px] sm:text-[10px] font-bold px-2 py-1 rounded-lg transition shrink-0">Roast Draw</button>
+                    <button id="redDrawBtn" onclick="requestSurrender('red')" class="bg-rose-100 border border-rose-300 text-rose-800 hover:bg-rose-200 text-[9px] sm:text-[10px] font-bold px-2 py-1 rounded-lg transition shrink-0">Roast Surrender</button>
                 </div>
             </div>
 
@@ -306,7 +303,7 @@
             </div>
 
             <div class="flex justify-between items-center w-full px-1 shrink-0 gap-1 h-[32px]">
-                <button id="blueDrawBtn" onclick="requestDraw('blue')" class="bg-sky-100 border border-sky-300 text-sky-800 hover:bg-sky-200 text-[9px] sm:text-[10px] font-bold px-2 py-1 rounded-lg transition shrink-0">Cold Draw</button>
+                <button id="blueDrawBtn" onclick="requestSurrender('blue')" class="bg-sky-100 border border-sky-300 text-sky-800 hover:bg-sky-200 text-[9px] sm:text-[10px] font-bold px-2 py-1 rounded-lg transition shrink-0">Cold Surrender</button>
                 <div id="statusMessage" class="text-[10px] sm:text-[11px] text-center text-[var(--text-muted)] theme-subcard px-2 py-0.5 rounded-xl border flex-1 max-w-md font-medium truncate mx-1">
                     Click Ready to start! Select any piece on the board to move forward or step into boxes.
                 </div>
@@ -368,14 +365,15 @@
 
     </main>
 
+    <!-- Interactive Peer-to-Peer Confirmation Modal -->
     <div id="confirmModal" class="fixed inset-0 bg-black/70 backdrop-blur-md z-50 flex items-center justify-center p-3 hidden">
         <div class="theme-card border rounded-2xl max-w-sm w-full p-4 sm:p-5 shadow-2xl space-y-3 text-center">
             <div class="flex justify-center text-3xl" id="confirmIcon">⚠️</div>
-            <h2 id="confirmTitle" class="text-sm sm:text-base font-bold text-[var(--text-main)] uppercase tracking-wide">Action Confirmation</h2>
-            <p id="confirmMessage" class="text-xs text-[var(--text-muted)] leading-relaxed">Are you sure you want to proceed with this action?</p>
+            <h2 id="confirmTitle" class="text-sm sm:text-base font-bold text-[var(--text-main)] uppercase tracking-wide">Action Request</h2>
+            <p id="confirmMessage" class="text-xs text-[var(--text-muted)] leading-relaxed">A request has been made.</p>
             <div class="flex gap-2 pt-2">
-                <button id="confirmCancelBtn" onclick="closeConfirmModal(false)" class="flex-1 theme-subcard border text-[var(--text-main)] font-bold py-2 rounded-xl text-xs hover:opacity-80 transition">Cancel</button>
-                <button id="confirmOkBtn" onclick="closeConfirmModal(true)" class="flex-1 theme-btn-accent font-bold py-2 rounded-xl text-xs shadow hover:opacity-90 transition">Confirm</button>
+                <button id="confirmCancelBtn" onclick="closeConfirmModal(false)" class="flex-1 theme-subcard border text-[var(--text-main)] font-bold py-2 rounded-xl text-xs hover:opacity-80 transition">Decline / Cancel</button>
+                <button id="confirmOkBtn" onclick="closeConfirmModal(true)" class="flex-1 theme-btn-accent font-bold py-2 rounded-xl text-xs shadow hover:opacity-90 transition">Accept / Confirm</button>
             </div>
         </div>
     </div>
@@ -641,7 +639,6 @@
 
         let confirmCallback = null;
 
-        // Automatically detect if user is on a mobile phone view
         function checkPhoneView() {
             const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768;
             if (isMobileDevice) {
@@ -714,7 +711,7 @@
             if (gameState.gameMode === 'online') {
                 toggleModal('onlineModal', true);
             } else {
-                showStatus(gameState.gameMode === '2p' ? "2P Face-to-Face ready! Click Ready to begin." : "Barista Bot ready! Click Ready to start.");
+                showStatus(gameState.gameMode === '2p' ? "2P Face-to-Face ready! Click Ready to begin." : `1P vs Bot (${gameState.botDifficulty}) ready! Click Ready.`);
             }
         }
 
@@ -799,6 +796,9 @@
                             document.getElementById('roomStatusText').innerText = "Guest connected! Both players click Ready.";
                         }
                     })
+                    .on('broadcast', { event: 'peer_action' }, ({ payload }) => {
+                        handlePeerAction(payload);
+                    })
                     .on('broadcast', { event: 'guest_join' }, () => {
                         if (gameState.onlineRole === 'host') {
                             document.getElementById('roomStatusText').innerText = "Guest connected! Both players click Ready.";
@@ -839,9 +839,70 @@
             } catch (e) {}
         }
 
+        async function sendPeerAction(actionType, data = {}) {
+            if (gameState.gameMode === 'online' && gameState.supabaseChannel) {
+                try {
+                    await gameState.supabaseChannel.send({
+                        type: 'broadcast',
+                        event: 'peer_action',
+                        payload: { actionType, sender: gameState.onlineRole, ...data }
+                    });
+                } catch(e) {}
+            }
+        }
+
+        function handlePeerAction(payload) {
+            const senderSide = payload.sender === 'host' ? 'red' : 'blue';
+            const recipientSide = senderSide === 'red' ? 'blue' : 'red';
+            
+            if (gameState.playerSide !== recipientSide && gameState.gameMode === 'online') return;
+
+            if (payload.actionType === 'ready') {
+                openConfirmModal("⏳", "Opponent Ready", `${senderSide === 'red' ? 'Dark Roast (+)' : 'Cold Brew (-)'} has clicked Ready! Do you want to ready up?`, (accepted) => {
+                    if (accepted) {
+                        if (recipientSide === 'red') gameState.redReady = true;
+                        else gameState.blueReady = true;
+                        if (gameState.redReady && gameState.blueReady) {
+                            gameState.gameStarted = true;
+                            startTimer();
+                            showStatus("Both players ready! Match started.");
+                        }
+                        renderBoard();
+                        syncOnlineState();
+                    }
+                });
+            } else if (payload.actionType === 'pause') {
+                openConfirmModal("⏸️", "Pause Request", `${senderSide === 'red' ? 'Dark Roast (+)' : 'Cold Brew (-)'} has requested to pause the game. Do you agree?`, (accepted) => {
+                    if (accepted) {
+                        gameState.gamePaused = true;
+                        showStatus("Game paused by mutual agreement.");
+                        renderBoard();
+                        syncOnlineState();
+                    }
+                });
+            } else if (payload.actionType === 'reset') {
+                openConfirmModal("🔄", "Reset Request", `${senderSide === 'red' ? 'Dark Roast (+)' : 'Cold Brew (-)'} has requested to reset the match. Do you agree?`, (accepted) => {
+                    if (accepted) {
+                        executeReset();
+                        showStatus("Match reset by mutual agreement.");
+                    }
+                });
+            } else if (payload.actionType === 'surrender') {
+                openConfirmModal("🏳️", "Surrender / Resign", `${senderSide === 'red' ? 'Dark Roast (+)' : 'Cold Brew (-)'} has surrendered! Do you accept the victory?`, (accepted) => {
+                    if (accepted) {
+                        gameState.gameStarted = false;
+                        const winner = recipientSide === 'red' ? 'Dark Roast (+)' : 'Cold Brew (-)';
+                        showStatus(`${winner} wins by surrender!`);
+                        logNotation('neutral', 'SURRENDER', `${senderSide} surrendered.`);
+                        renderBoard();
+                    }
+                });
+            }
+        }
+
         function openConfirmModal(icon, title, message, onResult) {
             document.getElementById('confirmIcon').innerText = icon || "⚠️";
-            document.getElementById('confirmTitle').innerText = title || "Action Confirmation";
+            document.getElementById('confirmTitle').innerText = title || "Action Request";
             document.getElementById('confirmMessage').innerText = message;
             confirmCallback = onResult;
             toggleModal('confirmModal', true);
@@ -853,6 +914,101 @@
                 const cb = confirmCallback;
                 confirmCallback = null;
                 cb(result);
+            }
+        }
+
+        function requestReady() {
+            if (gameState.gameStarted) {
+                showStatus("Match is already active!");
+                return;
+            }
+            if (gameState.gameMode === 'online') {
+                if (gameState.playerSide === 'red') gameState.redReady = true;
+                else gameState.blueReady = true;
+                sendPeerAction('ready');
+                showStatus("Ready signal sent to opponent. Waiting for confirmation...");
+                renderBoard();
+                syncOnlineState();
+            } else if (gameState.gameMode === 'bot') {
+                gameState.redReady = true;
+                gameState.blueReady = true;
+                gameState.gameStarted = true;
+                startTimer();
+                showStatus("Bot match started! Dark Roast (+) moves first.");
+                renderBoard();
+            } else {
+                openConfirmModal("⏳", "Ready Confirmation", "Does Player 2 (Cold Brew -) confirm they are ready?", (accepted) => {
+                    if (accepted) {
+                        gameState.redReady = true;
+                        gameState.blueReady = true;
+                        gameState.gameStarted = true;
+                        startTimer();
+                        showStatus("Both players ready! Match started.");
+                        renderBoard();
+                    }
+                });
+            }
+        }
+
+        function requestPause() {
+            if (!gameState.gameStarted) {
+                showStatus("Match has not started yet.");
+                return;
+            }
+            if (gameState.gameMode === 'online') {
+                sendPeerAction('pause');
+                showStatus("Pause request sent to opponent...");
+            } else if (gameState.gameMode === 'bot') {
+                gameState.gamePaused = !gameState.gamePaused;
+                showStatus(gameState.gamePaused ? "Match Paused." : "Match Resumed.");
+                document.getElementById('pauseBtn').innerText = gameState.gamePaused ? "Resume" : "Pause";
+            } else {
+                const requestingSide = gameState.turn === 'red' ? 'Dark Roast (+)' : 'Cold Brew (-)';
+                const targetSide = gameState.turn === 'red' ? 'Cold Brew (-)' : 'Dark Roast (+)';
+                openConfirmModal("⏸️", "Pause Request", `${requestingSide} requested to pause the game. Does ${targetSide} agree?`, (accepted) => {
+                    if (accepted) {
+                        gameState.gamePaused = !gameState.gamePaused;
+                        showStatus(gameState.gamePaused ? "Match Paused by agreement." : "Match Resumed.");
+                        document.getElementById('pauseBtn').innerText = gameState.gamePaused ? "Resume" : "Pause";
+                    } else {
+                        showStatus("Pause request declined.");
+                    }
+                });
+            }
+        }
+
+        function requestReset() {
+            if (gameState.gameMode === 'online') {
+                sendPeerAction('reset');
+                showStatus("Reset request sent to opponent...");
+            } else {
+                openConfirmModal("🔄", "Reset Request", "Are you sure you want to request a match reset? Both sides must agree.", (accepted) => {
+                    if (accepted) {
+                        executeReset();
+                        showStatus("Match has been reset.");
+                    } else {
+                        showStatus("Reset request declined.");
+                    }
+                });
+            }
+        }
+
+        function requestSurrender(side) {
+            if (!gameState.gameStarted) return;
+            const sideName = side === 'red' ? 'Dark Roast (+)' : 'Cold Brew (-)';
+            if (gameState.gameMode === 'online') {
+                sendPeerAction('surrender', { side });
+                showStatus("Surrender notice sent to opponent.");
+            } else {
+                openConfirmModal("🏳️", "Surrender Confirmation", `${sideName} wants to surrender. Do you confirm?`, (confirmed) => {
+                    if (confirmed) {
+                        gameState.gameStarted = false;
+                        const winner = side === 'red' ? 'Cold Brew (-)' : 'Dark Roast (+)';
+                        showStatus(`${winner} wins by surrender!`);
+                        logNotation('neutral', 'SURRENDER', `${sideName} surrendered.`);
+                        renderBoard();
+                    }
+                });
             }
         }
 
@@ -934,76 +1090,6 @@
             showStatus("Move redone!");
             renderBoard();
             if (gameState.gameMode === 'online') syncOnlineState();
-        }
-
-        function toggleReadyState() {
-            if (gameState.gameStarted) {
-                openConfirmModal("⏳", "Waiting for Ready State", "Match is currently active. Click OK to continue playing.");
-                return;
-            }
-            executeToggleReady();
-        }
-
-        function executeToggleReady() {
-            if (gameState.gameMode === 'online') {
-                if (gameState.playerSide === 'red') gameState.redReady = !gameState.redReady;
-                else gameState.blueReady = !gameState.blueReady;
-            } else {
-                gameState.redReady = true;
-                gameState.blueReady = true;
-            }
-
-            if (gameState.redReady && gameState.blueReady) {
-                gameState.gameStarted = true;
-                gameState.gamePaused = false;
-                startTimer();
-                showStatus("Both players ready! Match started. Dark Roast (+) moves first.");
-            } else {
-                openConfirmModal("⏳", "Waiting for Opponent Ready", "Your status is set to Ready! Waiting for opponent response...");
-                showStatus("You are Ready. Waiting for opponent response...");
-            }
-
-            renderBoard();
-            if (gameState.gameMode === 'online') syncOnlineState();
-        }
-
-        function togglePauseState() {
-            if (!gameState.gameStarted) {
-                openConfirmModal("⚠️", "Cannot Pause", "Match has not started yet. Click Ready to begin.");
-                return;
-            }
-            gameState.gamePaused = !gameState.gamePaused;
-            const pauseBtn = document.getElementById('pauseBtn');
-
-            if (gameState.gamePaused) {
-                if (pauseBtn) pauseBtn.innerText = "Resume";
-                openConfirmModal("⏸️", "Match Paused", "Match is currently paused. Click Resume to continue playing.");
-                showStatus("Match Paused. Waiting for resume...");
-            } else {
-                if (pauseBtn) pauseBtn.innerText = "Pause";
-                showStatus("Match Resumed.");
-            }
-
-            renderBoard();
-            if (gameState.gameMode === 'online') syncOnlineState();
-        }
-
-        function requestDraw(side) {
-            if (!gameState.gameStarted) return;
-            openConfirmModal("🤝", "Confirm Draw Request", "Waiting for response to declare a Draw for both sides?", (confirmed) => {
-                if (confirmed) {
-                    gameState.gameStarted = false;
-                    showStatus("Match declared a Draw!");
-                    logNotation('neutral', 'DRAW', 'Match ended in a Draw.');
-                    renderBoard();
-                }
-            });
-        }
-
-        function confirmResetMatch() {
-            openConfirmModal("⚠️", "Waiting for Reset Response", "Are you sure you want to reset the entire match and clear score history?", (confirmed) => {
-                if (confirmed) executeReset();
-            });
         }
 
         function executeReset() {
@@ -1251,7 +1337,6 @@
         }
 
         function autoScaleBoard() {
-            // Auto-scale layout boundaries on mobile phone view or non-phone window resizing
             const scaler = document.getElementById('boardScaler');
             const viewport = document.getElementById('boardViewport');
             if (!scaler || !viewport) return;
@@ -1263,7 +1348,7 @@
             if (boardW === 0 || boardH === 0) return;
             let scale = Math.min(availW / boardW, availH / boardH);
             if (document.body.classList.contains('is-phone-view')) {
-                scale = Math.min(scale, 0.85); // Slightly scale down on phones for comfort
+                scale = Math.min(scale, 0.85);
             } else {
                 scale = Math.min(scale, 1.0);
             }
@@ -1356,7 +1441,8 @@
 
         function handlePieceSelect(rowName, rectIdx, fromBox = 'center') {
             if (!gameState.gameStarted || gameState.gamePaused) return;
-            if (gameState.turn !== gameState.playerSide && gameState.gameMode !== '2p') return;
+            if (gameState.gameMode === 'bot' && gameState.turn !== gameState.playerSide) return;
+            if (gameState.gameMode === 'online' && gameState.turn !== gameState.playerSide) return;
 
             const rect = gameState.board[`${rowName}-${rectIdx}`];
             if (!rect) return;
@@ -1378,6 +1464,8 @@
 
         function handleBoxClick(rowName, rectIdx, box) {
             if (!gameState.gameStarted || gameState.gamePaused || !gameState.selectedPiece) return;
+            if (gameState.gameMode === 'bot' && gameState.turn !== gameState.playerSide) return;
+
             const rect = gameState.board[`${rowName}-${rectIdx}`];
             if (!rect) return;
 
@@ -1400,6 +1488,8 @@
 
         function handleTargetRectClick(rowName, rectIdx) {
             if (!gameState.gameStarted || gameState.gamePaused || !gameState.selectedPiece) return;
+            if (gameState.gameMode === 'bot' && gameState.turn !== gameState.playerSide) return;
+
             const sel = gameState.selectedPiece;
             const rect = gameState.board[`${rowName}-${rectIdx}`];
             if (!rect) return;
@@ -1421,6 +1511,8 @@
 
         function handleInfZoneClick(zone) {
             if (!gameState.gameStarted || gameState.gamePaused || !gameState.selectedPiece) return;
+            if (gameState.gameMode === 'bot' && gameState.turn !== gameState.playerSide) return;
+
             const sel = gameState.selectedPiece;
             const targetRow = zone === 'K' ? 'K' : 'A';
             if (isValidMove(sel.rowName, sel.rectIdx, sel.fromBox, targetRow, 0, sel.piece)) {
@@ -1470,7 +1562,12 @@
             gameState.turn = gameState.turn === 'red' ? 'blue' : 'red';
             gameState.selectedPiece = null;
             renderBoard();
-            if (gameState.gameMode === 'online') syncOnlineState();
+
+            if (gameState.gameMode === 'online') {
+                syncOnlineState();
+            } else if (gameState.gameMode === 'bot' && gameState.gameStarted && gameState.turn !== gameState.playerSide) {
+                setTimeout(makeBotMove, 600);
+            }
         }
 
         function resolveBinaryOp(rectObj, movingPiece, landingBox) {
@@ -1506,6 +1603,68 @@
             return 0;
         }
 
+        function makeBotMove() {
+            if (!gameState.gameStarted || gameState.gamePaused) return;
+            const botColor = gameState.playerSide === 'red' ? 'blue' : 'red';
+            if (gameState.turn !== botColor) return;
+
+            let allValidMoves = [];
+
+            for (let k in gameState.board) {
+                const rect = gameState.board[k];
+                ['center', 'a', 'b'].forEach(box => {
+                    let piece = box === 'center' ? rect.centerPiece : (box === 'a' ? rect.aPiece : rect.bPiece);
+                    if (piece && piece.color === botColor) {
+                        const targetRows = ROW_NAMES;
+                        targetRows.forEach(tRow => {
+                            if (tRow === 'K' || tRow === 'A') {
+                                if (isValidMove(rect.rowName, rect.rectIdx, box, tRow, 0, piece, 'center')) {
+                                    allValidMoves.push({ fromRow: rect.rowName, fromRect: rect.rectIdx, fromBox: box, toRow: tRow, toRect: 0, boxChoice: 'center', piece, score: 50 });
+                                }
+                            } else {
+                                const ops = OPERATIONS_CONFIG[tRow];
+                                if (ops) {
+                                    ops.forEach((opObj, tCol) => {
+                                        ['a', 'b'].forEach(targetBox => {
+                                            if (isValidMove(rect.rowName, rect.rectIdx, box, tRow, tCol, piece, targetBox)) {
+                                                let moveScore = Math.random() * 10;
+                                                const destRect = gameState.board[`${tRow}-${tCol}`];
+                                                if (destRect && (destRect.aPiece || destRect.bPiece)) {
+                                                    moveScore += 30;
+                                                }
+                                                if (gameState.botDifficulty === 'hard') {
+                                                    const ordDiff = Math.abs(ROW_ORDER_MAP[tRow] - ROW_ORDER_MAP[rect.rowName]);
+                                                    moveScore += ordDiff * 5;
+                                                }
+                                                allValidMoves.push({ fromRow: rect.rowName, fromRect: rect.rectIdx, fromBox: box, toRow: tRow, toRect: tCol, boxChoice: targetBox, piece, score: moveScore });
+                                            }
+                                        });
+                                    });
+                                }
+                            }
+                        });
+                    }
+                });
+            }
+
+            if (allValidMoves.length === 0) {
+                showStatus("Barista Bot has no valid moves available! Turn skipped.");
+                gameState.turn = gameState.playerSide;
+                renderBoard();
+                return;
+            }
+
+            if (gameState.botDifficulty === 'easy') {
+                const chosen = allValidMoves[Math.floor(Math.random() * allValidMoves.length)];
+                executeMove(chosen.fromRow, chosen.fromRect, chosen.fromBox, chosen.toRow, chosen.toRect, chosen.boxChoice);
+            } else {
+                allValidMoves.sort((a, b) => b.score - a.score);
+                const chosen = allValidMoves[0];
+                executeMove(chosen.fromRow, chosen.fromRect, chosen.fromBox, chosen.toRow, chosen.toRect, chosen.boxChoice);
+            }
+            showStatus(`Barista Bot (${gameState.botDifficulty}) made its move.`);
+        }
+
         function logNotation(player, moveStr, detailStr) {
             gameState.logs.push({ player, moveStr, detailStr });
             const container = document.getElementById('notationLog');
@@ -1530,9 +1689,6 @@
         document.getElementById('onlineBtn').onclick = () => toggleModal('onlineModal', true);
         document.getElementById('mechanicsBtn').onclick = () => toggleModal('mechanicsModal', true);
         document.getElementById('notationBtn').onclick = () => toggleModal('notationModal', true);
-        document.getElementById('readyBtn').onclick = toggleReadyState;
-        document.getElementById('pauseBtn').onclick = togglePauseState;
-        document.getElementById('resetBtn').onclick = confirmResetMatch;
 
         function toggleModal(modalId, show) {
             document.getElementById(modalId).classList.toggle('hidden', !show);
@@ -1547,4 +1703,3 @@
     </script>
 </body>
 </html>
-
