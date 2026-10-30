@@ -122,45 +122,14 @@
             user-select: none;
         }
 
-        /* Desktop Layout Rules (Untouched and Identical to Original) */
+        /* Allow pinch-to-zoom and touch gestures exclusively on mobile phone views */
+        body.is-phone-view {
+            overflow: auto !important;
+            touch-action: pan-x pan-y pinch-zoom !important;
+        }
+
         body:not(.is-phone-view) {
             overflow: hidden !important;
-        }
-
-        /* Mobile Phone View Layout Rules matching uploaded reference */
-        body.is-phone-view {
-            overflow-y: auto !important;
-            overflow-x: hidden !important;
-            height: auto !important;
-            min-height: 100vh !important;
-            touch-action: pan-y pinch-zoom !important;
-        }
-
-        body.is-phone-view main {
-            display: flex !important;
-            flex-direction: column !important;
-            height: auto !important;
-            min-height: calc(100vh - 54px) !important;
-            padding: 8px !important;
-            gap: 10px !important;
-            overflow: visible !important;
-        }
-
-        body.is-phone-view header h1 {
-            font-size: 11px !important;
-        }
-
-        body.is-phone-view #boardViewport {
-            overflow-x: auto !important;
-            overflow-y: hidden !important;
-            width: 100% !important;
-            max-width: 100% !important;
-            padding: 4px 0 !important;
-        }
-
-        body.is-phone-view .xl\:w-72 {
-            width: 100% !important;
-            flex-direction: column !important;
         }
 
         ::-webkit-scrollbar {
@@ -192,6 +161,50 @@
         #notationLog {
             -ms-overflow-style: auto !important;
             scrollbar-width: thin !important;
+        }
+
+        /* Mobile Phone View Specific Adaptive Adjustments (DOES NOT AFFECT PC VIEW) */
+        body.is-phone-view main {
+            display: flex !important;
+            flex-direction: column !important;
+            height: auto !important;
+            padding: 4px !important;
+            gap: 6px !important;
+            overflow: visible !important;
+        }
+
+        body.is-phone-view header {
+            padding: 6px 8px !important;
+            height: auto !important;
+            min-height: 44px !important;
+            flex-wrap: wrap !important;
+        }
+
+        body.is-phone-view header h1 {
+            font-size: 10px !important;
+        }
+
+        body.is-phone-view header button {
+            padding: 3px 6px !important;
+            font-size: 9px !important;
+        }
+
+        body.is-phone-view .w-full.xl\:w-72 {
+            width: 100% !important;
+            flex-direction: row !important;
+            gap: 6px !important;
+        }
+
+        body.is-phone-view #boardViewport {
+            padding: 2px !important;
+            overflow: auto !important;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        body.is-phone-view .font-mono.text-\[11px\],
+        body.is-phone-view .font-mono.text-xs {
+            font-size: 9px !important;
+            padding: 2px 4px !important;
         }
 
         .font-board { font-family: 'Fredoka', sans-serif; }
@@ -633,7 +646,7 @@
 
         let confirmCallback = null;
 
-        // Automatically detect mobile phone view vs untouchable desktop window layout
+        // Automatically detect if user is on a mobile phone view
         function checkPhoneView() {
             const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768;
             if (isMobileDevice) {
@@ -1243,9 +1256,7 @@
         }
 
         function autoScaleBoard() {
-            // Desktop layouts remain pristine & untouched; mobile phone view scales dynamically via CSS
-            if (document.body.classList.contains('is-phone-view')) return;
-
+            // Auto-scale layout boundaries on mobile phone view or non-phone window resizing
             const scaler = document.getElementById('boardScaler');
             const viewport = document.getElementById('boardViewport');
             if (!scaler || !viewport) return;
@@ -1256,7 +1267,11 @@
             const boardH = scaler.scrollHeight;
             if (boardW === 0 || boardH === 0) return;
             let scale = Math.min(availW / boardW, availH / boardH);
-            scale = Math.min(scale, 1.0);
+            if (document.body.classList.contains('is-phone-view')) {
+                scale = Math.min(scale, 0.85); // Slightly scale down on phones for comfort
+            } else {
+                scale = Math.min(scale, 1.0);
+            }
             scale = Math.max(scale, 0.2);
             scaler.style.transform = `scale(${scale})`;
         }
