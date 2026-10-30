@@ -177,6 +177,33 @@
             font-size: 11px !important;
         }
 
+        /* Compact Clocks & Aroma points card on mobile */
+        body.is-phone-view #clocksCard {
+            padding: 8px !important;
+            gap: 6px !important;
+        }
+
+        body.is-phone-view .clock-box {
+            padding: 6px 8px !important;
+        }
+
+        /* Scaled down board dimensions for phone view */
+        body.is-phone-view .ibog-rect {
+            width: 2.3cm !important;
+            height: 1.15cm !important;
+        }
+
+        body.is-phone-view .ibog-box {
+            width: 0.68cm !important;
+            height: 0.95cm !important;
+        }
+
+        body.is-phone-view .ibog-domain {
+            width: 2.3cm !important;
+            height: 1.15cm !important;
+            font-size: 9px !important;
+        }
+
         .font-board { font-family: 'Fredoka', sans-serif; }
         .font-mono { font-family: 'JetBrains Mono', monospace; }
 
@@ -296,14 +323,14 @@
 
         <div class="w-full xl:w-72 flex flex-row xl:flex-col gap-2 shrink-0 h-auto xl:h-full overflow-hidden">
             
-            <div class="theme-card border rounded-2xl p-2 shadow-sm flex flex-col justify-center gap-1.5 flex-1 xl:flex-none">
+            <div id="clocksCard" class="theme-card border rounded-2xl p-2 shadow-sm flex flex-col justify-center gap-1.5 flex-1 xl:flex-none">
                 <h3 class="font-bold text-[11px] uppercase tracking-wider text-[var(--text-main)] border-b border-[var(--border-card)] pb-1 flex items-center justify-between">
                     <span>CLOCKS & AROMA POINTS</span>
                     <span>⏱️</span>
                 </h3>
                 
                 <div class="grid grid-cols-2 xl:grid-cols-1 gap-1.5">
-                    <div class="theme-subcard border p-1.5 rounded-xl flex justify-between items-center">
+                    <div class="clock-box theme-subcard border p-1.5 rounded-xl flex justify-between items-center">
                         <div>
                             <div class="text-[9px] text-rose-600 font-extrabold uppercase tracking-wide">DARK ROAST (+)</div>
                             <div class="text-[10px] text-[var(--text-main)]">Score: <span id="redScore" class="font-black text-rose-600 text-xs">0</span></div>
@@ -314,7 +341,7 @@
                         </div>
                     </div>
 
-                    <div class="theme-subcard border p-1.5 rounded-xl flex justify-between items-center">
+                    <div class="clock-box theme-subcard border p-1.5 rounded-xl flex justify-between items-center">
                         <div>
                             <div class="text-[9px] text-sky-600 font-extrabold uppercase tracking-wide">COLD BREW (-)</div>
                             <div class="text-[10px] text-[var(--text-main)]">Score: <span id="blueScore" class="font-black text-sky-600 text-xs">0</span></div>
@@ -616,7 +643,6 @@
 
         let confirmCallback = null;
 
-        // Automatically detect if user is on a mobile phone view
         function checkPhoneView() {
             const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768;
             if (isMobileDevice) {
@@ -1107,7 +1133,7 @@
             rK.className = "flex justify-center w-full";
             const kPiece = gameState.board['K-0'].centerPiece;
             rK.innerHTML = `
-                <div class="bg-rose-700 text-white border-2 border-rose-800 font-black px-1 py-0.5 rounded-xl text-center shadow-md cursor-pointer transition text-xs tracking-wider flex items-center justify-center gap-1.5 shrink-0" style="width: 3.0cm; height: 1.4cm;" onclick="handleInfZoneClick('K')">
+                <div class="ibog-domain bg-rose-700 text-white border-2 border-rose-800 font-black px-1 py-0.5 rounded-xl text-center shadow-md cursor-pointer transition text-xs tracking-wider flex items-center justify-center gap-1.5 shrink-0" style="width: 3.0cm; height: 1.4cm;" onclick="handleInfZoneClick('K')">
                     <span class="font-black text-[10px] leading-tight flex-1 text-center">+∞ ROAST DOMAIN</span>
                     ${kPiece ? `<span class="bg-white text-rose-700 font-board px-1.5 py-0.5 rounded-lg text-xs font-black shadow cursor-pointer border border-rose-300 shrink-0" onclick="event.stopPropagation(); handlePieceSelect('K', 0, 'center')">${kPiece.label}</span>` : ''}
                 </div>
@@ -1132,7 +1158,7 @@
                     const rectEl = document.createElement('div');
                     let bgStyle = isGreen ? 'background-color: var(--tile-dark-bg); border-color: var(--tile-dark-border);' : 'background-color: var(--tile-light-bg); border-color: var(--tile-light-border);';
                     rectEl.style.cssText = `width: 3.0cm; height: 1.4cm; ${bgStyle}`;
-                    rectEl.className = `rounded-xl border-2 flex items-center justify-between px-1 py-0.5 relative shadow-sm transition transform shrink-0 ${isSelected ? 'highlight-rect ring-4 ring-amber-400 z-10 scale-[1.02]' : ''}`;
+                    rectEl.className = `ibog-rect rounded-xl border-2 flex items-center justify-between px-1 py-0.5 relative shadow-sm transition transform shrink-0 ${isSelected ? 'highlight-rect ring-4 ring-amber-400 z-10 scale-[1.02]' : ''}`;
 
                     const boxAEl = document.createElement('div');
                     const hasAPiece = rect.aPiece !== null;
@@ -1141,14 +1167,14 @@
                     
                     boxAEl.style.width = '0.85cm';
                     boxAEl.style.height = '1.1cm';
-                    boxAEl.className = `rounded-lg flex items-center justify-center font-board text-xs font-bold cursor-pointer transition shrink-0 ${boxABg} ${isPieceASelected ? 'ring-2 ring-amber-300 ring-offset-1 scale-105' : ''}`;
+                    boxAEl.className = `ibog-box rounded-lg flex items-center justify-center font-board text-xs font-bold cursor-pointer transition shrink-0 ${boxABg} ${isPieceASelected ? 'ring-2 ring-amber-300 ring-offset-1 scale-105' : ''}`;
                     boxAEl.innerText = hasAPiece ? rect.aPiece.label : 'a';
                     boxAEl.onclick = (e) => { e.stopPropagation(); if (hasAPiece) handlePieceSelect(rowName, c, 'a'); else handleBoxClick(rowName, c, 'a'); };
 
                     const centerEl = document.createElement('div');
                     centerEl.style.width = '0.85cm';
                     centerEl.style.height = '1.1cm';
-                    centerEl.className = "flex flex-col items-center justify-center cursor-pointer mx-auto shrink-0";
+                    centerEl.className = "ibog-box flex flex-col items-center justify-center cursor-pointer mx-auto shrink-0";
                     
                     if (rect.centerPiece) {
                         const p = rect.centerPiece;
@@ -1169,7 +1195,7 @@
                     
                     boxBEl.style.width = '0.85cm';
                     boxBEl.style.height = '1.1cm';
-                    boxBEl.className = `rounded-lg flex items-center justify-center font-board text-xs font-bold cursor-pointer transition shrink-0 ${boxBBg} ${isPieceBSelected ? 'ring-2 ring-amber-300 ring-offset-1 scale-105' : ''}`;
+                    boxBEl.className = `ibog-box rounded-lg flex items-center justify-center font-board text-xs font-bold cursor-pointer transition shrink-0 ${boxBBg} ${isPieceBSelected ? 'ring-2 ring-amber-300 ring-offset-1 scale-105' : ''}`;
                     boxBEl.innerText = hasBPiece ? rect.bPiece.label : 'b';
                     boxBEl.onclick = (e) => { e.stopPropagation(); if (hasBPiece) handlePieceSelect(rowName, c, 'b'); else handleBoxClick(rowName, c, 'b'); };
 
@@ -1186,7 +1212,7 @@
             rA.className = "flex justify-center w-full";
             const aPiece = gameState.board['A-0'].centerPiece;
             rA.innerHTML = `
-                <div class="bg-sky-700 text-white border-2 border-sky-800 font-black px-1 py-0.5 rounded-xl text-center shadow-md cursor-pointer transition text-xs tracking-wider flex items-center justify-center gap-1.5 shrink-0" style="width: 3.0cm; height: 1.4cm;" onclick="handleInfZoneClick('A')">
+                <div class="ibog-domain bg-sky-700 text-white border-2 border-sky-800 font-black px-1 py-0.5 rounded-xl text-center shadow-md cursor-pointer transition text-xs tracking-wider flex items-center justify-center gap-1.5 shrink-0" style="width: 3.0cm; height: 1.4cm;" onclick="handleInfZoneClick('A')">
                     <span class="font-black text-[10px] leading-tight flex-1 text-center">-∞ COLD DOMAIN</span>
                     ${aPiece ? `<span class="bg-white text-sky-700 font-board px-1.5 py-0.5 rounded-lg text-xs font-black shadow cursor-pointer border border-sky-300 shrink-0" onclick="event.stopPropagation(); handlePieceSelect('A', 0, 'center')">${aPiece.label}</span>` : ''}
                 </div>
@@ -1226,7 +1252,6 @@
         }
 
         function autoScaleBoard() {
-            // Only auto-scale layout boundaries on non-phone window resizing if needed
             if (document.body.classList.contains('is-phone-view')) return;
 
             const scaler = document.getElementById('boardScaler');
