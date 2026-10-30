@@ -235,30 +235,30 @@
 
     <header class="sticky top-0 z-30 theme-card border-b px-2 py-1.5 sm:px-4 sm:py-2 flex justify-between items-center shadow-md shrink-0 gap-1 h-[48px] sm:h-[54px]">
         <div class="flex items-center gap-1.5 shrink-0">
-            <span class="text-base sm:text-xl">☕</span>
-            <h1 class="text-[11px] sm:text-xs md:text-sm font-black uppercase tracking-wider text-[var(--text-main)] truncate max-w-[100px] sm:max-w-none">IBOG CAFÉ</h1>
+            <span class="text-base sm:text-xl">&#9749;</span>
+            <h1 class="text-[11px] sm:text-xs md:text-sm font-black uppercase tracking-wider text-[var(--text-main)] truncate max-w-[100px] sm:max-w-none">IBOG CAF&Eacute;</h1>
         </div>
 
         <div class="flex items-center gap-1 overflow-x-auto py-0.5 max-w-[75vw] sm:max-w-none">
             <button id="undoBtn" onclick="undoMove()" class="bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed text-white text-[10px] sm:text-xs font-bold px-2 py-1 sm:px-2.5 sm:py-1.5 rounded-lg transition shadow-sm shrink-0 flex items-center gap-1" title="Undo Move">
-                <span>↩</span><span class="hidden xs:inline">Undo</span>
+                <span>&#8617;</span><span class="hidden xs:inline">Undo</span>
             </button>
             <button id="redoBtn" onclick="redoMove()" class="bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed text-white text-[10px] sm:text-xs font-bold px-2 py-1 sm:px-2.5 sm:py-1.5 rounded-lg transition shadow-sm shrink-0 flex items-center gap-1" title="Next / Redo Move">
-                <span class="hidden xs:inline">Next</span><span>↪</span>
+                <span class="hidden xs:inline">Next</span><span>&#8618;</span>
             </button>
 
             <button id="readyBtn" onclick="requestReady()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] sm:text-xs font-bold px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg transition shadow-sm shrink-0">Ready</button>
             <button id="pauseBtn" onclick="requestPause()" class="bg-amber-700 hover:bg-amber-800 text-white text-[10px] sm:text-xs font-bold px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg transition shadow-sm shrink-0">Pause</button>
             
-            <button id="configBtn" class="theme-btn-accent text-[10px] sm:text-xs font-bold px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg transition shadow-sm flex items-center gap-0.5 shrink-0">
-                <span>⚙️</span> <span class="hidden xs:inline">Setup</span>
+            <button id="configBtn" onclick="toggleModal('setupModal', true)" class="theme-btn-accent text-[10px] sm:text-xs font-bold px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg transition shadow-sm flex items-center gap-0.5 shrink-0">
+                <span>Match Setup</span>
             </button>
-            <button id="paletteBtn" class="bg-amber-600 hover:bg-amber-700 text-white text-[10px] sm:text-xs font-bold px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg transition shadow-sm flex items-center gap-0.5 shrink-0">
-                <span>🎨</span> <span class="hidden xs:inline">Themes</span>
+            <button id="paletteBtn" onclick="toggleModal('paletteModal', true)" class="bg-amber-600 hover:bg-amber-700 text-white text-[10px] sm:text-xs font-bold px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg transition shadow-sm flex items-center gap-0.5 shrink-0">
+                <span>Themes</span>
             </button>
-            <button id="onlineBtn" class="bg-purple-700 hover:bg-purple-800 text-white text-[10px] sm:text-xs font-bold px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg transition shadow-sm shrink-0">Online</button>
-            <button id="mechanicsBtn" class="theme-subcard hover:opacity-80 text-[10px] sm:text-xs font-semibold px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg transition border text-[var(--text-main)] shrink-0">Rules</button>
-            <button id="notationBtn" class="theme-subcard hover:opacity-80 text-[10px] sm:text-xs font-semibold px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg transition border text-[var(--text-main)] shrink-0 hidden md:inline-block">Notations</button>
+            <button id="onlineBtn" onclick="toggleModal('onlineModal', true)" class="bg-purple-700 hover:bg-purple-800 text-white text-[10px] sm:text-xs font-bold px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg transition shadow-sm shrink-0">Online</button>
+            <button id="mechanicsBtn" onclick="toggleModal('mechanicsModal', true)" class="theme-subcard hover:opacity-80 text-[10px] sm:text-xs font-semibold px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg transition border text-[var(--text-main)] shrink-0">Rules</button>
+            <button id="notationBtn" onclick="toggleModal('notationModal', true)" class="theme-subcard hover:opacity-80 text-[10px] sm:text-xs font-semibold px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg transition border text-[var(--text-main)] shrink-0 hidden md:inline-block">Notations</button>
             <button id="resetBtn" onclick="requestReset()" class="theme-subcard hover:opacity-80 text-[10px] sm:text-xs font-semibold px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg transition border text-[var(--text-main)] shrink-0">Reset</button>
         </div>
     </header>
@@ -288,15 +288,15 @@
                 <div id="boardScaler" class="flex flex-col items-center justify-center transition-transform origin-center gap-1">
                     
                     <div class="w-full flex flex-col items-center justify-center gap-0.5 px-3 py-1 text-[11px] sm:text-xs font-mono font-bold text-[var(--text-main)] bg-[var(--bg-subcard)] rounded-xl border-2 border-[var(--border-card)] shadow-sm text-center">
-                        <div>k/0 = ±∞ | k/±∞ = 0 | 0/k = 0 | 0/±∞ = 0 | ±∞/0 = ±∞</div>
-                        <div class="text-[var(--accent-primary)] text-[10px] sm:text-[11px]">∞ - ∞ = indeterminate | ∞/∞ = indeterminate | 0*(∞) = indeterminate</div>
+                        <div><i>k</i> / 0 = &plusmn;&infin; | <i>k</i> / &plusmn;&infin; = 0 | 0 / <i>k</i> = 0 | 0 / &plusmn;&infin; = 0 | &plusmn;&infin; / 0 = &plusmn;&infin;</div>
+                        <div class="text-[var(--accent-primary)] text-[10px] sm:text-[11px]">&infin; &minus; &infin; = indeterminate | &infin; / &infin; = indeterminate | 0 &times; &infin; = indeterminate</div>
                     </div>
 
                     <div id="ibogBoard" class="flex flex-col gap-0.5 w-max items-center py-0.5"></div>
 
                     <div class="w-full flex flex-col items-center justify-center gap-0.5 px-3 py-1 text-[11px] sm:text-xs font-mono font-bold text-[var(--text-main)] bg-[var(--bg-subcard)] rounded-xl border-2 border-[var(--border-card)] shadow-sm text-center">
-                        <div>k/0 = ±∞ | k/±∞ = 0 | 0/k = 0 | 0/±∞ = 0 | ±∞/0 = ±∞</div>
-                        <div class="text-[var(--accent-primary)] text-[10px] sm:text-[11px]">∞ - ∞ = indeterminate | ∞/∞ = indeterminate | 0*(∞) = indeterminate</div>
+                        <div><i>k</i> / 0 = &plusmn;&infin; | <i>k</i> / &plusmn;&infin; = 0 | 0 / <i>k</i> = 0 | 0 / &plusmn;&infin; = 0 | &plusmn;&infin; / 0 = &plusmn;&infin;</div>
+                        <div class="text-[var(--accent-primary)] text-[10px] sm:text-[11px]">&infin; &minus; &infin; = indeterminate | &infin; / &infin; = indeterminate | 0 &times; &infin; = indeterminate</div>
                     </div>
 
                 </div>
@@ -321,7 +321,7 @@
             <div class="theme-card border rounded-2xl p-3 sm:p-3.5 shadow-sm flex flex-col justify-center gap-2 flex-1 xl:flex-none">
                 <h3 class="font-bold text-[11px] sm:text-xs uppercase tracking-wider text-[var(--text-main)] pb-1 flex items-center justify-between border-b border-[var(--border-card)]">
                     <span>CLOCKS & AROMA POINTS</span>
-                    <span>⏱️</span>
+                    <span>&#9201;&#65039;</span>
                 </h3>
                 
                 <div class="grid grid-cols-2 gap-2">
@@ -352,7 +352,7 @@
             <div class="theme-card border rounded-2xl p-3 sm:p-3.5 shadow-sm flex flex-col flex-1 min-h-[140px] xl:min-h-0 overflow-hidden">
                 <div class="flex justify-between items-center mb-1.5 pb-1 border-b border-[var(--border-card)] shrink-0">
                     <h3 class="font-bold text-[11px] sm:text-xs text-[var(--text-main)] uppercase tracking-wider flex items-center gap-1">
-                        <span>☕ RECIPE LEDGER</span>
+                        <span>&#9749; RECIPE LEDGER</span>
                     </h3>
                     <span class="text-[9px] font-bold text-[var(--text-muted)]" id="moveCount">Brewed: 0</span>
                 </div>
@@ -365,10 +365,36 @@
 
     </main>
 
+    <!-- Welcome Purpose & Instructions Sidebar -->
+    <div id="welcomeSidebar" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-3">
+        <div class="theme-card border rounded-2xl max-w-md w-full p-5 shadow-2xl space-y-4 relative max-h-[90vh] overflow-y-auto">
+            <button onclick="closeWelcomeSidebar()" class="absolute top-4 right-4 text-[var(--text-muted)] hover:text-[var(--text-main)] font-bold text-lg p-1.5 rounded-full theme-subcard border transition">&#10005;</button>
+            <div class="flex items-center gap-2 border-b border-[var(--border-card)] pb-3">
+                <span class="text-2xl">&#9749;</span>
+                <h2 class="text-base sm:text-lg font-bold text-[var(--text-main)] uppercase tracking-wide">Welcome to IBOG Café</h2>
+            </div>
+            <div class="space-y-3 text-xs text-[var(--text-main)] leading-relaxed">
+                <div>
+                    <h3 class="font-bold text-[var(--accent-primary)] mb-1 uppercase tracking-wider text-[11px]">&bull; Purpose of the Game</h3>
+                    <p class="text-[var(--text-muted)]">IBOG Café Tournament combines strategic board maneuvering with rational number binary operations. Players compare numbers and manage operations to accumulate positive aroma points (Dark Roast) or negative aroma points (Cold Brew) while competing for domain supremacy.</p>
+                </div>
+                <div>
+                    <h3 class="font-bold text-[var(--accent-primary)] mb-1 uppercase tracking-wider text-[11px]">&bull; How to Play on This Website</h3>
+                    <ul class="list-disc pl-5 space-y-1 text-[var(--text-muted)]">
+                        <li><strong>Select Mode:</strong> Click on <strong>Match Setup</strong> to choose between 2P Face-to-Face, 1P vs Bot, or Online Play.</li>
+                        <li><strong>Moving Pieces:</strong> Click any piece of your color on the board to select it, then click a valid destination tile or box ('a' / 'b') to move.</li>
+                        <li><strong>Operations &amp; Scoring:</strong> Landing on occupied tiles triggers binary operations (+, &minus;, &times;, &divide;) or infinity domain entries to win pieces and score points.</li>
+                    </ul>
+                </div>
+            </div>
+            <button onclick="closeWelcomeSidebar()" class="w-full theme-btn-accent font-bold py-2.5 rounded-xl transition shadow text-xs uppercase tracking-wider">Proceed to Match Setup</button>
+        </div>
+    </div>
+
     <!-- Interactive Peer-to-Peer Confirmation Modal -->
     <div id="confirmModal" class="fixed inset-0 bg-black/70 backdrop-blur-md z-50 flex items-center justify-center p-3 hidden">
         <div class="theme-card border rounded-2xl max-w-sm w-full p-4 sm:p-5 shadow-2xl space-y-3 text-center">
-            <div class="flex justify-center text-3xl" id="confirmIcon">⚠️</div>
+            <div class="flex justify-center text-3xl" id="confirmIcon">&#9888;&#65039;</div>
             <h2 id="confirmTitle" class="text-sm sm:text-base font-bold text-[var(--text-main)] uppercase tracking-wide">Action Request</h2>
             <p id="confirmMessage" class="text-xs text-[var(--text-muted)] leading-relaxed">A request has been made.</p>
             <div class="flex gap-2 pt-2">
@@ -382,15 +408,15 @@
         <div class="theme-card border rounded-2xl max-w-md w-full p-4 sm:p-5 shadow-2xl space-y-3 max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center border-b border-[var(--border-card)] pb-2">
                 <div class="flex items-center gap-2">
-                    <span class="text-lg">🎨</span>
-                    <h2 class="text-sm sm:text-base font-bold text-[var(--text-main)] uppercase tracking-wide">Café Theme Palette</h2>
+                    <span class="text-lg">&#127912;</span>
+                    <h2 class="text-sm sm:text-base font-bold text-[var(--text-main)] uppercase tracking-wide">Caf&eacute; Theme Palette</h2>
                 </div>
-                <button onclick="toggleModal('paletteModal', false)" class="text-[var(--text-muted)] hover:text-[var(--text-main)] font-bold text-lg p-1">✕</button>
+                <button onclick="toggleModal('paletteModal', false)" class="text-[var(--text-muted)] hover:text-[var(--text-main)] font-bold text-lg p-1">&#10005;</button>
             </div>
             <div class="grid grid-cols-1 gap-2 text-xs">
                 <button onclick="setTheme('matcha')" class="flex items-center justify-between p-2.5 rounded-xl border border-emerald-300 bg-[#eef7f2] hover:ring-2 hover:ring-emerald-500 transition text-left">
                     <div class="flex items-center gap-2.5">
-                        <div class="w-7 h-7 rounded-lg bg-[#006850] flex items-center justify-center text-white font-bold text-xs">🌿</div>
+                        <div class="w-7 h-7 rounded-lg bg-[#006850] flex items-center justify-center text-white font-bold text-xs">&#127807;</div>
                         <div>
                             <div class="font-bold text-[#0a3d2e]">Matcha Mint Café</div>
                             <div class="text-[9px] text-[#4b7a67]">Soft mint sage background with emerald tiles</div>
@@ -399,7 +425,7 @@
                 </button>
                 <button onclick="setTheme('honeybutter')" class="flex items-center justify-between p-2.5 rounded-xl border border-amber-300 bg-[#fffbeb] hover:ring-2 hover:ring-amber-500 transition text-left">
                     <div class="flex items-center gap-2.5">
-                        <div class="w-7 h-7 rounded-lg bg-amber-500 flex items-center justify-center text-white font-bold text-xs">🍯</div>
+                        <div class="w-7 h-7 rounded-lg bg-amber-500 flex items-center justify-center text-white font-bold text-xs">&#127847;</div>
                         <div>
                             <div class="font-bold text-amber-900">Honey Butter Brew</div>
                             <div class="text-[9px] text-amber-700">Warm golden yellow palette with honey accents</div>
@@ -408,7 +434,7 @@
                 </button>
                 <button onclick="setTheme('espresso')" class="flex items-center justify-between p-2.5 rounded-xl border border-amber-900/60 bg-[#181210] hover:ring-2 hover:ring-amber-500 transition text-left">
                     <div class="flex items-center gap-2.5">
-                        <div class="w-7 h-7 rounded-lg bg-[#d97706] flex items-center justify-center text-white font-bold text-xs">☕</div>
+                        <div class="w-7 h-7 rounded-lg bg-[#d97706] flex items-center justify-center text-white font-bold text-xs">&#9749;</div>
                         <div>
                             <div class="font-bold text-amber-200">Espresso Dark Roast</div>
                             <div class="text-[9px] text-amber-400/80">Rich dark coffee roast, warm amber & espresso</div>
@@ -417,7 +443,7 @@
                 </button>
                 <button onclick="setTheme('latte')" class="flex items-center justify-between p-2.5 rounded-xl border border-amber-200 bg-[#f7f3ed] hover:ring-2 hover:ring-amber-700 transition text-left">
                     <div class="flex items-center gap-2.5">
-                        <div class="w-7 h-7 rounded-lg bg-[#8c5319] flex items-center justify-center text-white font-bold text-xs">🥛</div>
+                        <div class="w-7 h-7 rounded-lg bg-[#8c5319] flex items-center justify-center text-white font-bold text-xs">&#129383;</div>
                         <div>
                             <div class="font-bold text-[#3d2612]">Latte Macchiato</div>
                             <div class="text-[9px] text-[#785a3c]">Creamy beige background with caramel accents</div>
@@ -426,7 +452,7 @@
                 </button>
                 <button onclick="setTheme('cappuccino')" class="flex items-center justify-between p-2.5 rounded-xl border border-slate-600 bg-[#1e242b] hover:ring-2 hover:ring-amber-400 transition text-left">
                     <div class="flex items-center gap-2.5">
-                        <div class="w-7 h-7 rounded-lg bg-[#c28e5c] flex items-center justify-center text-slate-900 font-bold text-xs">🌙</div>
+                        <div class="w-7 h-7 rounded-lg bg-[#c28e5c] flex items-center justify-center text-slate-900 font-bold text-xs">&#127769;</div>
                         <div>
                             <div class="font-bold text-slate-100">Cappuccino Dusk</div>
                             <div class="text-[9px] text-slate-400">Sleek slate dark UI with hazelnut highlights</div>
@@ -441,24 +467,24 @@
     <div id="mechanicsModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-3 hidden">
         <div class="theme-card border rounded-2xl max-w-xl w-full p-4 sm:p-5 shadow-2xl max-h-[85vh] overflow-y-auto">
             <div class="flex justify-between items-center mb-2 border-b border-[var(--border-card)] pb-2">
-                <h2 class="text-sm sm:text-base font-bold text-[var(--text-main)]">IBOG Rules & Café Mechanics</h2>
-                <button onclick="toggleModal('mechanicsModal', false)" class="text-[var(--text-muted)] hover:text-[var(--text-main)] font-bold text-lg p-1">✕</button>
+                <h2 class="text-sm sm:text-base font-bold text-[var(--text-main)]">IBOG Rules &amp; Café Mechanics</h2>
+                <button onclick="toggleModal('mechanicsModal', false)" class="text-[var(--text-muted)] hover:text-[var(--text-main)] font-bold text-lg p-1">&#10005;</button>
             </div>
             <div class="text-[11px] sm:text-xs text-[var(--text-main)] space-y-2.5 leading-relaxed">
                 <p><strong>1. Objective:</strong> Compare rational numbers through binary operations to accumulate positive aroma points (Dark Roast) or negative points (Cold Brew).</p>
                 <p><strong>2. Turns:</strong> Dark Roast (+) pieces move first, followed by Cold Brew (-) pieces in alternating turns.</p>
-                <p><strong>3. Any Piece Mobility:</strong> All pieces on the board—whether starting from center or boxes 'a' and 'b'—can advance forward or move to adjacent valid tiles according to board connectivity and alternating tile color rules.</p>
-                <p><strong>4. Rectangle Color Rule (Boxes a & b):</strong> A single rectangle cannot contain two pieces of the same color across boxes 'a' and 'b'. Once one box is occupied, the other is off-limits to pieces of that same color.</p>
+                <p><strong>3. Any Piece Mobility:</strong> All pieces on the board&mdash;whether starting from center or boxes 'a' and 'b'&mdash;can advance forward or move to adjacent valid tiles according to board connectivity and alternating tile color rules.</p>
+                <p><strong>4. Rectangle Color Rule (Boxes a &amp; b):</strong> A single rectangle cannot contain two pieces of the same color across boxes 'a' and 'b'. Once one box is occupied, the other is off-limits to pieces of that same color.</p>
                 <p><strong>5. Arrow Restriction Rule:</strong> Pieces starting from their initial center positions are strictly forbidden from moving directly into their specific target restriction rectangles on Row E (for red pieces) or Rows G, H, I (for blue pieces).</p>
-                <p><strong>6. Infinity Pieces:</strong> Reaching infinity zones (+∞ ROAST DOMAIN or -∞ COLD DOMAIN) or yielding infinity converts a piece to ∞, allowing rook-like unobstructed movement across rows and columns.</p>
+                <p><strong>6. Infinity Pieces:</strong> Reaching infinity zones (+&infin; ROAST DOMAIN or -&infin; COLD DOMAIN) or yielding infinity converts a piece to &infin;, allowing rook-like unobstructed movement across rows and columns.</p>
                 <p><strong>7. Binary Operations Rules:</strong></p>
                 <ul class="list-disc pl-5 space-y-1 text-[10px] sm:text-[11px]">
-                    <li><strong>k / 0 = ±∞:</strong> The resulting infinity piece retains the owner color and sign of the constant (k).</li>
-                    <li><strong>k / ±∞ = 0:</strong> Dividing any constant $k$ by infinity results in $0$.</li>
-                    <li><strong>0 / k = 0:</strong> Dividing $0$ by any non-zero constant $k$ results in $0$.</li>
-                    <li><strong>0 / ±∞ = 0:</strong> Dividing $0$ by infinity results in $0$.</li>
-                    <li><strong>±∞ / 0 = ±∞:</strong> Infinity divided by $0$ yields infinity with the owner color and sign of the numerator infinity.</li>
-                    <li><strong>Indeterminate Formats:</strong> $(\infty - \infty)$, $(\infty / \infty)$, and $(0 \times \infty)$ yield indeterminate result and eliminate both pieces.</li>
+                    <li><strong><i>k</i> / 0 = &plusmn;&infin;:</strong> The resulting infinity piece retains the owner color and sign of the constant (<i>k</i>).</li>
+                    <li><strong><i>k</i> / &plusmn;&infin; = 0:</strong> Dividing any constant <i>k</i> by infinity results in 0.</li>
+                    <li><strong>0 / <i>k</i> = 0:</strong> Dividing 0 by any non-zero constant <i>k</i> results in 0.</li>
+                    <li><strong>0 / &plusmn;&infin; = 0:</strong> Dividing 0 by infinity results in 0.</li>
+                    <li><strong>&plusmn;&infin; / 0 = &plusmn;&infin;:</strong> Infinity divided by 0 yields infinity with the owner color and sign of the numerator infinity.</li>
+                    <li><strong>Indeterminate Formats:</strong> (&infin; &minus; &infin;), (&infin; / &infin;), and (0 &times; &infin;) yield indeterminate result and eliminate both pieces.</li>
                 </ul>
                 <p><strong>8. Time Control:</strong> Each player is given 15 minutes. Running out of time deducts 25 points.</p>
             </div>
@@ -469,7 +495,7 @@
         <div class="theme-card border rounded-2xl max-w-xl w-full p-4 sm:p-5 shadow-2xl max-h-[85vh] overflow-y-auto">
             <div class="flex justify-between items-center mb-2 border-b border-[var(--border-card)] pb-2">
                 <h2 class="text-sm sm:text-base font-bold text-[var(--text-main)]">Official Recipe Notation Guide</h2>
-                <button onclick="toggleModal('notationModal', false)" class="text-[var(--text-muted)] hover:text-[var(--text-main)] font-bold text-lg p-1">✕</button>
+                <button onclick="toggleModal('notationModal', false)" class="text-[var(--text-muted)] hover:text-[var(--text-main)] font-bold text-lg p-1">&#10005;</button>
             </div>
             <div class="text-[11px] sm:text-xs text-[var(--text-main)] space-y-2 leading-relaxed">
                 <p><strong>Notation Format:</strong> [PieceValue]-[Row][Column][Box]</p>
@@ -511,7 +537,7 @@
                     </div>
                 </div>
             </div>
-            <button onclick="applySetupAndClose()" class="w-full theme-btn-accent font-bold py-2 rounded-xl transition shadow text-xs uppercase tracking-wider">Confirm Setup & Play</button>
+            <button onclick="applySetupAndClose()" class="w-full theme-btn-accent font-bold py-2 rounded-xl transition shadow text-xs uppercase tracking-wider">Confirm Setup &amp; Play</button>
         </div>
     </div>
 
@@ -519,7 +545,7 @@
         <div class="theme-card border rounded-2xl max-w-sm w-full p-4 sm:p-5 shadow-2xl space-y-3 text-xs">
             <div class="flex justify-between items-center border-b border-[var(--border-card)] pb-2">
                 <h2 class="text-sm sm:text-base font-bold text-[var(--text-main)] uppercase tracking-wide">Online Café Match</h2>
-                <button onclick="toggleModal('onlineModal', false)" class="text-[var(--text-muted)] font-bold text-lg p-1">✕</button>
+                <button onclick="toggleModal('onlineModal', false)" class="text-[var(--text-muted)] font-bold text-lg p-1">&#10005;</button>
             </div>
             <p class="text-[var(--text-muted)] text-[11px]">Create a room ID or join an existing game room.</p>
             <div class="space-y-2.5 pt-1">
@@ -648,6 +674,11 @@
 
         let confirmCallback = null;
 
+        function closeWelcomeSidebar() {
+            document.getElementById('welcomeSidebar').classList.add('hidden');
+            toggleModal('setupModal', true);
+        }
+
         function checkPhoneView() {
             const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768;
             if (isMobileDevice) {
@@ -766,7 +797,6 @@
 
             subscribeToOnlineRoom(roomId);
             
-            // Notify the host that a guest has joined
             setTimeout(() => {
                 sendGuestJoinEvent();
             }, 500);
@@ -796,12 +826,12 @@
             gameState.guestConnected = true;
             const statusText = document.getElementById('roomStatusText');
             if (statusText) {
-                statusText.innerText = "Opponent has joined the room! Both players click Ready to start.";
+                statusText.innerText = "The other player has already joined the room!";
                 statusText.className = "text-[10px] text-emerald-600 font-bold transition-all";
             }
             
             if (gameState.onlineRole === 'host') {
-                showStatus("🎉 Opponent joined the room! Click Ready when you are ready.");
+                showStatus("🔔 Notification: The other player has already joined the room!");
                 syncOnlineState(true);
             }
         }
@@ -1263,7 +1293,7 @@
             const kPiece = gameState.board['K-0'].centerPiece;
             rK.innerHTML = `
                 <div class="bg-rose-700 text-white border-2 border-rose-800 font-black px-1 py-0.5 rounded-xl text-center shadow-md cursor-pointer transition text-xs tracking-wider flex items-center justify-center gap-1.5 shrink-0" style="width: 3.0cm; height: 1.4cm;" onclick="handleInfZoneClick('K')">
-                    <span class="font-black text-[10px] leading-tight flex-1 text-center">+∞ ROAST DOMAIN</span>
+                    <span class="font-black text-[10px] leading-tight flex-1 text-center">+&infin; ROAST DOMAIN</span>
                     ${kPiece ? `<span class="bg-white text-rose-700 font-board px-1.5 py-0.5 rounded-lg text-xs font-black shadow cursor-pointer border border-rose-300 shrink-0" onclick="event.stopPropagation(); handlePieceSelect('K', 0, 'center')">${kPiece.label}</span>` : ''}
                 </div>
             `;
@@ -1342,7 +1372,7 @@
             const aPiece = gameState.board['A-0'].centerPiece;
             rA.innerHTML = `
                 <div class="bg-sky-700 text-white border-2 border-sky-800 font-black px-1 py-0.5 rounded-xl text-center shadow-md cursor-pointer transition text-xs tracking-wider flex items-center justify-center gap-1.5 shrink-0" style="width: 3.0cm; height: 1.4cm;" onclick="handleInfZoneClick('A')">
-                    <span class="font-black text-[10px] leading-tight flex-1 text-center">-∞ COLD DOMAIN</span>
+                    <span class="font-black text-[10px] leading-tight flex-1 text-center">-&infin; COLD DOMAIN</span>
                     ${aPiece ? `<span class="bg-white text-sky-700 font-board px-1.5 py-0.5 rounded-lg text-xs font-black shadow cursor-pointer border border-sky-300 shrink-0" onclick="event.stopPropagation(); handlePieceSelect('A', 0, 'center')">${aPiece.label}</span>` : ''}
                 </div>
             `;
@@ -1806,12 +1836,6 @@
             const el = document.getElementById('statusMessage');
             if (el) el.innerText = msg;
         }
-
-        document.getElementById('configBtn').onclick = () => toggleModal('setupModal', true);
-        document.getElementById('paletteBtn').onclick = () => toggleModal('paletteModal', true);
-        document.getElementById('onlineBtn').onclick = () => toggleModal('onlineModal', true);
-        document.getElementById('mechanicsBtn').onclick = () => toggleModal('mechanicsModal', true);
-        document.getElementById('notationBtn').onclick = () => toggleModal('notationModal', true);
 
         function toggleModal(modalId, show) {
             document.getElementById(modalId).classList.toggle('hidden', !show);
